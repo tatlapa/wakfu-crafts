@@ -1,5 +1,5 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div class=" w-full p-2 bg-black text-white">Fils de pute</div>
+  <div class=" w-full p-2 bg-black text-white">Wakfu crafter</div>
 </template>

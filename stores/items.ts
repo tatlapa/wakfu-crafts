@@ -1,72 +1,68 @@
 import { defineStore } from "pinia";
+import type { Item } from "~/types/itemTypes";
 
 export const useItemsStore = defineStore("items-store", {
   state: () => ({
-    items: [] as any[], // Liste complète des objets
-    craftableItemsIds: new Set<number>(), // Liste des IDs des objets craftables
-    itemTypes: new Map<number, string>(), // Map des types d'objets
-    selectedItemTypes: new Set<number>(), // Types d'objets sélectionnés
-    showCraftableOnly: false, // Toggle pour filtrer les objets craftables
-    userLang: "fr",
+    items: [] as Item[], // Liste complète des objets
+    itemTypes: [] as any[], // Liste complète des types d'objets
+    recipeResults: [] as any[], // Liste des recettes
+    jobs: [] as any[], // Liste des métiers
+    userLang: "fr", // Langue de l'utilisateur (par défaut : français)
+    loading: false,
   }),
   actions: {
     async getItems() {
+      this.loading = true;
+
       try {
         const version = "1.85.1.29";
-        const proxyUrl = "http://localhost:8080/"; // Proxy CORS Anywhere
+        const proxyUrl = "http://localhost:8080/";
         const itemsUrl = `${proxyUrl}https://wakfu.cdn.ankama.com/gamedata/${version}/items.json`;
-        const recipesUrl = `${proxyUrl}https://wakfu.cdn.ankama.com/gamedata/${version}/recipeResults.json`;
+
+        this.items = await $fetch<any[]>(itemsUrl);
+        console.log("Récupération des objets :", this.items);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des données :", error);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async getItemTypes() {
+      try {
+        const version = "1.85.1.29";
+        const proxyUrl = "http://localhost:8080/";
         const itemTypesUrl = `${proxyUrl}https://wakfu.cdn.ankama.com/gamedata/${version}/itemTypes.json`;
 
-        console.log("Récupération des items :", itemsUrl);
-        console.log("Récupération des recettes :", recipesUrl);
-        console.log("Récupération des types d'objets :", itemTypesUrl);
-
-        // Récupération des objets
-        this.items = await $fetch(itemsUrl, {
-          headers: { "x-requested-with": "XMLHttpRequest" },
-        });
-
-        // Récupération des recettes pour identifier les objets craftables
-        const recipes = await $fetch<any[]>(recipesUrl, {
-          headers: { "x-requested-with": "XMLHttpRequest" },
-        });
-        this.craftableItemsIds = new Set(
-          recipes.map((recipe) => recipe.productedItemId)
-        );
-
-        // Récupération des types d'objets
-        const itemTypesData = await $fetch<any[]>(itemTypesUrl, {
-          headers: { "x-requested-with": "XMLHttpRequest" },
-        });
-
-        // Stocker les types d'objets dans une Map (id -> titre)
-        this.itemTypes = new Map(
-          itemTypesData.map((type) => [
-            type.definition.id,
-            (type.title?.[this.userLang] ?? "Type inconnu")
-              .replace(/{\[~1\]\?s:}/g, "") // Supprime {[~1]?s:}
-              .replace(/{\[~1\]\?x:}/g, ""), // Supprime {[~1]?x:}
-          ])
-        );
-
-        console.log("Types d'objets chargés :", this.itemTypes);
-
-        // Détection automatique de la langue utilisateur
-        const browserLang = navigator.language.split("-")[0];
-        this.userLang = ["fr", "en", "es", "de"].includes(browserLang)
-          ? browserLang
-          : "fr";
-        console.log("Langue détectée :", this.userLang);
+        this.itemTypes = await $fetch<any[]>(itemTypesUrl);
+        console.log("Récupération des types d'objets :", this.itemTypes);
       } catch (error) {
         console.error("Erreur lors de la récupération des données :", error);
       }
     },
-    toggleItemTypeFilter(itemTypeId: number) {
-      if (this.selectedItemTypes.has(itemTypeId)) {
-        this.selectedItemTypes.delete(itemTypeId);
-      } else {
-        this.selectedItemTypes.add(itemTypeId);
+    async getJobs() {
+      try {
+        const version = "1.85.1.29";
+        const proxyUrl = "http://localhost:8080/";
+        const jobsUrl = `${proxyUrl}https://wakfu.cdn.ankama.com/gamedata/${version}/recipeCategories.json`;
+
+        this.jobs = await $fetch<any[]>(jobsUrl);
+        console.log("Récupération des métiers :", this.jobs);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des données :", error);
+      }
+    },
+    async getUserLang() {
+      try {
+        const lang = localStorage.getItem("lang");
+
+        if (lang) {
+          this.userLang = lang;
+        }
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération de la langue de l'utilisateur :",
+          error
+        );
       }
     },
   },
