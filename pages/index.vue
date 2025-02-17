@@ -25,6 +25,8 @@ const itemsStore = useItemsStore();
 const searchQuery = ref("");
 const currentPage = ref(1);
 const itemsPerPage = 12;
+const hideDroppable = ref(false);
+const droppableItemsSet = ref<Set<number>>(new Set());
 
 const rarityArray = [
   {
@@ -53,6 +55,37 @@ onMounted(async () => {
   await itemsStore.getItemTypes();
   await itemsStore.getJobs();
   await itemsStore.loadAllCSVs();
+
+  // Stocke les ID des objets droppables
+  const droppableIds = new Set<number>();
+
+  const dataSources = [
+    itemsStore.armures,
+    itemsStore.armes,
+    itemsStore.accessoires,
+    itemsStore.consommables,
+    itemsStore.ressources,
+    itemsStore.familiers,
+  ];
+
+  dataSources.forEach((dataSource) => {
+    dataSource.forEach((data) => {
+      // Vérifie que l'objet est droppable et possède un lien
+      if (data["Peut être obtenu sur"] === "Oui" && data["Lien"]) {
+        const itemId = extractIdFromUrl(data["Lien"]); // Extraire l'ID depuis le lien
+        if (itemId !== null) {
+          droppableIds.add(itemId);
+        } else {
+          console.warn("❌ Impossible d'extraire l'ID pour :", data);
+        }
+      }
+    });
+  });
+
+  // Vérifie les ID en console
+  console.log("✅ Liste des objets droppables :", [...droppableIds]);
+
+  droppableItemsSet.value = droppableIds;
 });
 
 // Fonction pour supprimer les accents d'une chaîne
@@ -97,6 +130,17 @@ const getItemImage = (item: any) => {
   return null;
 };
 
+const extractIdFromUrl = (url: string): number | null => {
+  if (!url) return null; // Vérifier que l'URL existe
+
+  const match = url.match(/\/(\d+)-/); // Trouve un nombre suivi d'un '-'
+  return match ? Number(match[1]) : null;
+};
+
+const isItemDroppable = (item: any) => {
+  return droppableItemsSet.value.has(item.definition.item.id);
+};
+
 const selectedRarities = ref<number[]>([]);
 
 const toggleRarity = (rarity: number) => {
@@ -120,13 +164,18 @@ const filteredItems = computed(() => {
     );
   }
 
-  // Filtre par rareté (si au moins une rareté est sélectionnée)
+  // Filtre par rareté
   if (selectedRarities.value.length > 0) {
     items = items.filter((item) =>
       selectedRarities.value.includes(
         item.definition.item.baseParameters.rarity
       )
     );
+  }
+
+  // Filtre pour cacher les objets droppables (si activé)
+  if (hideDroppable.value) {
+    items = items.filter((item) => !isItemDroppable(item));
   }
 
   return items;
@@ -168,6 +217,19 @@ const paginatedItems = computed(() => {
           {{ rarity.label }}
         </Button>
       </div>
+    </div>
+
+    <!-- CheckBox Hide Droppable -->
+
+    <div class="flex items-center gap-2">
+      <Checkbox
+        id="hideDroppable"
+        v-model:checked="hideDroppable"
+        class="w-5 h-5"
+      />
+      <label for="hideDroppable" class="text-sm cursor-pointer">
+        Cacher les objets droppables
+      </label>
     </div>
 
     <!-- Liste des objets -->
