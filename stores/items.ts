@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import Papa from "papaparse";
 import type { Item } from "~/types/itemTypes";
 
 export const useItemsStore = defineStore("items-store", {
@@ -9,11 +10,16 @@ export const useItemsStore = defineStore("items-store", {
     jobs: [] as any[], // Liste des métiers
     userLang: "fr", // Langue de l'utilisateur (par défaut : français)
     loading: false,
+    armuresData: [] as any[], // Stocke les armures
+    armesData: [] as any[], // Stocke les armes
+    accessoiresData: [] as any[], // Stocke les accessoires
+    consommablesData: [] as any[], // Stocke les consommables
+    ressourcesData: [] as any[], // Stocke les ressources
+    familiersData: [] as any[], // Stocke les familiers
   }),
   actions: {
     async getItems() {
       this.loading = true;
-
       try {
         const version = "1.85.1.29";
         const proxyUrl = "http://localhost:8080/";
@@ -21,8 +27,10 @@ export const useItemsStore = defineStore("items-store", {
 
         this.items = await $fetch<any[]>(itemsUrl);
         console.log("Récupération des objets :", this.items);
+        return true;
       } catch (error) {
-        console.error("Erreur lors de la récupération des données :", error);
+        console.error("Erreur lors de la récupération des objets :", error);
+        return false;
       } finally {
         this.loading = false;
       }
@@ -35,8 +43,13 @@ export const useItemsStore = defineStore("items-store", {
 
         this.itemTypes = await $fetch<any[]>(itemTypesUrl);
         console.log("Récupération des types d'objets :", this.itemTypes);
+        return true;
       } catch (error) {
-        console.error("Erreur lors de la récupération des données :", error);
+        console.error(
+          "Erreur lors de la récupération des types d'objets :",
+          error
+        );
+        return false;
       }
     },
     async getJobs() {
@@ -47,23 +60,64 @@ export const useItemsStore = defineStore("items-store", {
 
         this.jobs = await $fetch<any[]>(jobsUrl);
         console.log("Récupération des métiers :", this.jobs);
+        return true;
       } catch (error) {
-        console.error("Erreur lors de la récupération des données :", error);
+        console.error("Erreur lors de la récupération des métiers :", error);
+        return false;
       }
     },
-    async getUserLang() {
+    getUserLang() {
       try {
-        const lang = localStorage.getItem("lang");
+        const savedLang = localStorage.getItem("lang");
 
-        if (lang) {
-          this.userLang = lang;
+        if (savedLang) {
+          this.userLang = savedLang;
+        } else {
+          const browserLang = navigator.language.split("-")[0];
+          this.userLang = ["fr", "en", "es", "de", "pt"].includes(browserLang)
+            ? browserLang
+            : "fr";
+          localStorage.setItem("lang", this.userLang);
         }
+        return true;
       } catch (error) {
-        console.error(
-          "Erreur lors de la récupération de la langue de l'utilisateur :",
-          error
-        );
+        console.error("Erreur lors de la récupération de la langue :", error);
+        return false;
       }
+    },
+
+    async loadCSV(
+      fileName: string,
+      targetArray:
+        | "armuresData"
+        | "armesData"
+        | "accessoiresData"
+        | "consommablesData"
+        | "ressourcesData"
+        | "familiersData"
+    ) {
+      try {
+        const response = await fetch(`/${fileName}`);
+        const csvText = await response.text();
+
+        Papa.parse(csvText, {
+          header: true, // Utiliser la première ligne comme en-tête
+          skipEmptyLines: true,
+          complete: (result) => {
+            this[targetArray] = result.data; // Stocker les données dans le bon tableau
+          },
+        });
+      } catch (error) {
+        console.error(`Erreur lors du chargement du CSV ${fileName} :`, error);
+      }
+    },
+    async loadAllCSVs() {
+      await this.loadCSV("armures.csv", "armuresData");
+      await this.loadCSV("armes.csv", "armesData");
+      await this.loadCSV("accessoires.csv", "accessoiresData");
+      await this.loadCSV("consommables.csv", "consommablesData");
+      await this.loadCSV("ressources.csv", "ressourcesData");
+      await this.loadCSV("familiers.csv", "familiersData");
     },
   },
 });

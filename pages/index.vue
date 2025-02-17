@@ -16,16 +16,60 @@ import {
 const itemsStore = useItemsStore();
 const searchQuery = ref("");
 const currentPage = ref(1);
-const itemsPerPage = 20;
-const resetPagination = () => {
-  currentPage.value = 1;
-};
+const itemsPerPage = 12;
 
 onMounted(async () => {
   await itemsStore.getItems();
   await itemsStore.getItemTypes();
   await itemsStore.getJobs();
+  await itemsStore.loadAllCSVs();
 });
+
+const resetPagination = () => {
+  currentPage.value = 1;
+};
+
+// Fonction pour supprimer les accents d'une chaîne
+const removeAccents = (str: string) => {
+  return str
+    .normalize("NFD") // Décompose les accents
+    .replace(/[\u0300-\u036f]/g, "") // Supprime les accents
+    .toLowerCase(); // Convertit en minuscule pour éviter la sensibilité à la casse
+};
+
+const getItemImage = (item: any) => {
+  // Toujours récupérer le titre en français
+  const itemTitleFr = item.title["fr"];
+
+  if (!itemTitleFr) {
+    console.warn("⚠️ Aucun titre en français pour cet item :", item);
+    return null;
+  }
+
+  // Supprimer les accents et mettre en minuscule pour la comparaison
+  const normalizedTitle = removeAccents(itemTitleFr);
+
+  // Liste des tableaux à vérifier
+  const dataSources = [
+    itemsStore.armuresData,
+    itemsStore.armesData,
+    itemsStore.accessoiresData,
+    itemsStore.consommablesData,
+    itemsStore.ressourcesData,
+    itemsStore.familiersData,
+  ];
+
+  // Cherche l'image dans les 4 tableaux en comparant sans accents
+  for (const dataSource of dataSources) {
+    const imageObj = dataSource.find(
+      (data) => removeAccents(data.Nom) === normalizedTitle
+    );
+    if (imageObj) {
+      return imageObj.Image; // Retourne la première image trouvée
+    }
+  }
+  return null;
+};
 
 const filteredItems = computed(() => {
   if (!searchQuery.value) return itemsStore.items;
@@ -94,7 +138,7 @@ const paginatedItems = computed(() => {
     <!-- Liste d'items -->
     <div
       v-else
-      class="grid grid-cols-1 gap-4 my-4 md:grid-cols-2 lg:grid-cols-3"
+      class="grid grid-cols-1 gap-4 my-4 md:grid-cols-2 lg:grid-cols-4"
     >
       <Card
         v-for="item in paginatedItems"
@@ -102,38 +146,55 @@ const paginatedItems = computed(() => {
         class="p-4 border rounded"
       >
         <CardHeader>
-          <CardTitle>{{
-            item.title[
-              itemsStore.userLang as keyof typeof item.title as
-                | "en"
-                | "es"
-                | "fr"
-                | "pt"
-            ] ?? "Nom de l'objet non disponible"
-          }}</CardTitle>
-          <CardDescription>{{
-            item.description[
-              itemsStore.userLang as keyof typeof item.title as
-                | "en"
-                | "es"
-                | "fr"
-                | "pt"
-            ] ?? "Nom de l'objet non disponible"
-          }}</CardDescription>
+          <!-- Recherche de l'image correspondant au titre de l'item -->
+          <img
+            v-if="getItemImage(item)"
+            :src="getItemImage(item)"
+            alt="Item Image"
+            referrerpolicy="no-referrer"
+            class="w-12 h-12 rounded"
+          />
+
+          <CardTitle>
+            {{
+              item.title[
+                itemsStore.userLang as keyof typeof item.title as
+                  | "en"
+                  | "es"
+                  | "fr"
+                  | "pt"
+              ] ?? "Nom de l'objet non disponible"
+            }}
+          </CardTitle>
+
+          <!-- <CardDescription>
+            {{
+              item.description[
+                itemsStore.userLang as keyof typeof item.description as
+                  | "en"
+                  | "es"
+                  | "fr"
+                  | "pt"
+              ] ?? "Description non disponible"
+            }}
+          </CardDescription> -->
         </CardHeader>
+
         <CardContent> Niveau {{ item.definition.item.level }} </CardContent>
+        <CardContent> ID {{ item.definition.item.id }} </CardContent>
       </Card>
     </div>
 
     <!-- Pagination -->
     <div
       v-if="filteredItems.length > itemsPerPage"
-      class="mt-6 flex justify-center gap-2"
+      class="my-6 flex justify-center gap-2"
     >
       <Pagination
         v-slot="{ page }"
         v-model:page="currentPage"
-        :total="totalPages"
+        :total="filteredItems.length"
+        :itemsPerPage="itemsPerPage"
         :sibling-count="1"
         show-edges
       >
