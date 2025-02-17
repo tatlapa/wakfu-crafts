@@ -10,12 +10,12 @@ export const useItemsStore = defineStore("items-store", {
     jobs: [] as any[], // Liste des métiers
     userLang: "fr", // Langue de l'utilisateur (par défaut : français)
     loading: false,
-    armuresData: [] as any[], // Stocke les armures
-    armesData: [] as any[], // Stocke les armes
-    accessoiresData: [] as any[], // Stocke les accessoires
-    consommablesData: [] as any[], // Stocke les consommables
-    ressourcesData: [] as any[], // Stocke les ressources
-    familiersData: [] as any[], // Stocke les familiers
+    armures: [] as any[], // Stocke les armures
+    armes: [] as any[], // Stocke les armes
+    accessoires: [] as any[], // Stocke les accessoires
+    consommables: [] as any[], // Stocke les consommables
+    ressources: [] as any[], // Stocke les ressources
+    familiers: [] as any[], // Stocke les familiers
   }),
   actions: {
     async getItems() {
@@ -89,12 +89,12 @@ export const useItemsStore = defineStore("items-store", {
     async loadCSV(
       fileName: string,
       targetArray:
-        | "armuresData"
-        | "armesData"
-        | "accessoiresData"
-        | "consommablesData"
-        | "ressourcesData"
-        | "familiersData"
+        | "armures"
+        | "armes"
+        | "accessoires"
+        | "consommables"
+        | "ressources"
+        | "familiers"
     ) {
       try {
         const response = await fetch(`/${fileName}`);
@@ -112,12 +112,12 @@ export const useItemsStore = defineStore("items-store", {
       }
     },
     async loadAllCSVs() {
-      await this.loadCSV("armures.csv", "armuresData");
-      await this.loadCSV("armes.csv", "armesData");
-      await this.loadCSV("accessoires.csv", "accessoiresData");
-      await this.loadCSV("consommables.csv", "consommablesData");
-      await this.loadCSV("ressources.csv", "ressourcesData");
-      await this.loadCSV("familiers.csv", "familiersData");
+      await this.loadCSV("armures.csv", "armures");
+      await this.loadCSV("armes.csv", "armes");
+      await this.loadCSV("accessoires.csv", "accessoires");
+      await this.loadCSV("consommables.csv", "consommables");
+      await this.loadCSV("ressources.csv", "ressources");
+      await this.loadCSV("familiers.csv", "familiers");
     },
   },
 });

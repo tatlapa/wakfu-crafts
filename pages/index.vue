@@ -12,11 +12,41 @@ import {
   PaginationNext,
   PaginationPrev,
 } from "@/components/ui/pagination";
+import iconCommon from "~/assets/icons/rarity/common.png";
+import iconRare from "~/assets/icons/rarity/rare.png";
+import iconMythical from "~/assets/icons/rarity/mythic.png";
+import iconLegendary from "~/assets/icons/rarity/legendary.png";
+import iconEpic from "~/assets/icons/rarity/epic.png";
+import iconMemory from "~/assets/icons/rarity/memory.png";
+import iconRelic from "~/assets/icons/rarity/relic.png";
+import CardContent from "~/components/ui/card/CardContent.vue";
 
 const itemsStore = useItemsStore();
 const searchQuery = ref("");
 const currentPage = ref(1);
 const itemsPerPage = 12;
+
+const rarityArray = [
+  {
+    label: "Commun",
+    icon: iconCommon,
+    rarity: 1,
+  },
+  { label: "Rare", icon: iconRare, rarity: 2 },
+  {
+    label: "Mythique",
+    icon: iconMythical,
+    rarity: 3,
+  },
+  {
+    label: "Légendaire",
+    icon: iconLegendary,
+    rarity: 4,
+  },
+  { label: "Relique", icon: iconRelic, rarity: 5 },
+  { label: "Souvenir", icon: iconMemory, rarity: 6 },
+  { label: "Épique", icon: iconEpic, rarity: 7 },
+];
 
 onMounted(async () => {
   await itemsStore.getItems();
@@ -24,10 +54,6 @@ onMounted(async () => {
   await itemsStore.getJobs();
   await itemsStore.loadAllCSVs();
 });
-
-const resetPagination = () => {
-  currentPage.value = 1;
-};
 
 // Fonction pour supprimer les accents d'une chaîne
 const removeAccents = (str: string) => {
@@ -51,12 +77,12 @@ const getItemImage = (item: any) => {
 
   // Liste des tableaux à vérifier
   const dataSources = [
-    itemsStore.armuresData,
-    itemsStore.armesData,
-    itemsStore.accessoiresData,
-    itemsStore.consommablesData,
-    itemsStore.ressourcesData,
-    itemsStore.familiersData,
+    itemsStore.armures,
+    itemsStore.armes,
+    itemsStore.accessoires,
+    itemsStore.consommables,
+    itemsStore.ressources,
+    itemsStore.familiers,
   ];
 
   // Cherche l'image dans les 4 tableaux en comparant sans accents
@@ -71,20 +97,40 @@ const getItemImage = (item: any) => {
   return null;
 };
 
+const selectedRarities = ref<number[]>([]);
+
+const toggleRarity = (rarity: number) => {
+  if (selectedRarities.value.includes(rarity)) {
+    selectedRarities.value = selectedRarities.value.filter((r) => r !== rarity);
+  } else {
+    selectedRarities.value.push(rarity);
+  }
+};
+
 const filteredItems = computed(() => {
-  if (!searchQuery.value) return itemsStore.items;
+  let items = itemsStore.items;
 
-  const query = searchQuery.value.toLowerCase();
-  return itemsStore.items.filter((item) => {
-    return item.title[itemsStore.userLang as keyof typeof item.title]
-      .toLowerCase()
-      .includes(query);
-  });
+  // Filtre par recherche
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase();
+    items = items.filter((item) =>
+      item.title[itemsStore.userLang as keyof typeof item.title]
+        .toLowerCase()
+        .includes(query)
+    );
+  }
+
+  // Filtre par rareté (si au moins une rareté est sélectionnée)
+  if (selectedRarities.value.length > 0) {
+    items = items.filter((item) =>
+      selectedRarities.value.includes(
+        item.definition.item.baseParameters.rarity
+      )
+    );
+  }
+
+  return items;
 });
-
-const totalPages = computed(() =>
-  Math.ceil(filteredItems.value.length / itemsPerPage)
-);
 
 const paginatedItems = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage;
@@ -96,7 +142,7 @@ const paginatedItems = computed(() => {
 <template>
   <div class="mx-12">
     <!-- Barre de recherche -->
-    <div class="flex items-center justify-center mb-6">
+    <div class="flex items-center justify-between mb-6">
       <div class="relative">
         <Search
           class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground"
@@ -105,8 +151,22 @@ const paginatedItems = computed(() => {
           v-model="searchQuery"
           class="pl-10"
           placeholder="Rechercher un item..."
-          @input="resetPagination"
         />
+      </div>
+      <div class="flex gap-2">
+        <Button
+          v-for="rarity in rarityArray"
+          :key="rarity.rarity"
+          :class="{
+            'bg-blue-500 text-white': selectedRarities.includes(rarity.rarity),
+            'bg-gray-200 text-black': !selectedRarities.includes(rarity.rarity),
+          }"
+          @click="toggleRarity(rarity.rarity)"
+          class="hover:text-white"
+        >
+          <img :src="rarity.icon" alt="Rarity Icon" />
+          {{ rarity.label }}
+        </Button>
       </div>
     </div>
 
@@ -166,22 +226,21 @@ const paginatedItems = computed(() => {
               ] ?? "Nom de l'objet non disponible"
             }}
           </CardTitle>
-
-          <!-- <CardDescription>
-            {{
-              item.description[
-                itemsStore.userLang as keyof typeof item.description as
-                  | "en"
-                  | "es"
-                  | "fr"
-                  | "pt"
-              ] ?? "Description non disponible"
-            }}
-          </CardDescription> -->
         </CardHeader>
 
         <CardContent> Niveau {{ item.definition.item.level }} </CardContent>
         <CardContent> ID {{ item.definition.item.id }} </CardContent>
+        <CardContent>
+          <img
+            :src="
+              rarityArray.find(
+                (rarity) =>
+                  rarity.rarity === item.definition.item.baseParameters.rarity
+              ).icon
+            "
+            alt="Rarity Icon"
+          />
+        </CardContent>
       </Card>
     </div>
 
