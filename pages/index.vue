@@ -27,6 +27,7 @@ const currentPage = ref(1);
 const itemsPerPage = 12;
 const hideDroppable = ref(false);
 const droppableItemsSet = ref<Set<number>>(new Set());
+const levelRange = ref<[number, number]>([0, 245]); // Plage initiale de niveaux
 
 const rarityArray = [
   {
@@ -178,6 +179,16 @@ const filteredItems = computed(() => {
     items = items.filter((item) => !isItemDroppable(item));
   }
 
+  // Filtre par plage de niveaux
+  items = items.filter(
+    (item) =>
+      item.definition.item.level >= levelRange.value[0] &&
+      item.definition.item.level <= levelRange.value[1]
+  );
+
+  // 🏆 **Tri par niveau décroissant**
+  items.sort((a, b) => b.definition.item.level - a.definition.item.level);
+
   return items;
 });
 
@@ -232,6 +243,34 @@ const paginatedItems = computed(() => {
       </label>
     </div>
 
+    <!-- Slider pour la plage de niveaux -->
+    <div class="mt-3">
+      <div class="mb-2">Niveau {{ levelRange[0] }} - {{ levelRange[1] }}</div>
+      <Slider
+        v-model="levelRange"
+        :min="0"
+        :max="245"
+        :step="1"
+        :range="true"
+        class="w-1/3"
+      />
+    </div>
+
+    <div class="flex gap-2 mt-4">
+      <div v-for="job in itemsStore.jobs" class="flex gap-2 items-center">
+        <Checkbox />
+        <label for="">{{
+          job.title[
+            itemsStore.userLang as keyof typeof job.title as
+              | "en"
+              | "es"
+              | "fr"
+              | "pt"
+          ] ?? "Nom du métier non disponible"
+        }}</label>
+      </div>
+    </div>
+
     <!-- Liste des objets -->
     <h1 class="text-3xl font-bold">Liste des objets</h1>
     <div
@@ -277,7 +316,16 @@ const paginatedItems = computed(() => {
             class="w-12 h-12 rounded"
           />
 
-          <CardTitle>
+          <CardTitle class="flex gap-2 items-center">
+            <img
+              :src="
+                rarityArray.find(
+                  (rarity) =>
+                    rarity.rarity === item.definition.item.baseParameters.rarity
+                )?.icon
+              "
+              alt="Rarity Icon"
+            />
             {{
               item.title[
                 itemsStore.userLang as keyof typeof item.title as
@@ -292,17 +340,6 @@ const paginatedItems = computed(() => {
 
         <CardContent> Niveau {{ item.definition.item.level }} </CardContent>
         <CardContent> ID {{ item.definition.item.id }} </CardContent>
-        <CardContent>
-          <img
-            :src="
-              rarityArray.find(
-                (rarity) =>
-                  rarity.rarity === item.definition.item.baseParameters.rarity
-              ).icon
-            "
-            alt="Rarity Icon"
-          />
-        </CardContent>
       </Card>
     </div>
 
