@@ -6,7 +6,7 @@ export const useItemsStore = defineStore("items-store", {
   state: () => ({
     items: [] as Item[], // Liste complète des objets
     itemTypes: [] as any[], // Liste complète des types d'objets
-    recipeResults: [] as any[], // Liste des recettes
+    equipmentTypes: [] as any[], // Liste des types d'équipements
     jobs: [] as any[], // Liste des métiers
     userLang: "fr", // Langue de l'utilisateur (par défaut : français)
     loading: false,
@@ -47,6 +47,26 @@ export const useItemsStore = defineStore("items-store", {
       } catch (error) {
         console.error(
           "Erreur lors de la récupération des types d'objets :",
+          error
+        );
+        return false;
+      }
+    },
+    async getEquipmentTypes() {
+      try {
+        const version = "1.85.1.29";
+        const proxyUrl = "http://localhost:8080/";
+        const equipmentTypesUrl = `${proxyUrl}https://wakfu.cdn.ankama.com/gamedata/${version}/equipmentItemTypes.json`;
+
+        this.equipmentTypes = await $fetch<any[]>(equipmentTypesUrl);
+        console.log(
+          "Récupération des types d'équipement :",
+          this.equipmentTypes
+        );
+        return true;
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération des types d'équipement :",
           error
         );
         return false;

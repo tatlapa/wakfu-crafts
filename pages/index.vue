@@ -54,6 +54,7 @@ const rarityArray = [
 onMounted(async () => {
   await itemsStore.getItems();
   await itemsStore.getItemTypes();
+  await itemsStore.getEquipmentTypes();
   await itemsStore.getJobs();
   await itemsStore.loadAllCSVs();
 
@@ -82,9 +83,6 @@ onMounted(async () => {
       }
     });
   });
-
-  // Vérifie les ID en console
-  console.log("✅ Liste des objets droppables :", [...droppableIds]);
 
   droppableItemsSet.value = droppableIds;
 });
@@ -256,7 +254,9 @@ const paginatedItems = computed(() => {
       />
     </div>
 
-    <div class="flex gap-2 mt-4">
+    <!-- Liste des métiers -->
+    <p class="mt-4 text-xl">Métiers</p>
+    <div class="flex gap-2">
       <div v-for="job in itemsStore.jobs" class="flex gap-2 items-center">
         <Checkbox />
         <label for="">{{
@@ -267,6 +267,23 @@ const paginatedItems = computed(() => {
               | "fr"
               | "pt"
           ] ?? "Nom du métier non disponible"
+        }}</label>
+      </div>
+    </div>
+
+    <!-- Liste des types d'objets -->
+    <p class="mt-4 text-xl">Types d'objets</p>
+    <div class="flex gap-2">
+      <div v-for="itemType in itemsStore.itemTypes" class="flex gap-2 items-center">
+        <Checkbox />
+        <label for="">{{
+          itemType.title[
+            itemsStore.userLang as keyof typeof itemType.title as
+              | "en"
+              | "es"
+              | "fr"
+              | "pt"
+          ] ?? "Nom du type non disponible"
         }}</label>
       </div>
     </div>
