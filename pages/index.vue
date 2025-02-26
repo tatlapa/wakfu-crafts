@@ -130,19 +130,10 @@ const getItemImage = (item: any) => {
 };
 
 const getItemTypeTitle = (itemTypeId: number): string => {
-  // Cherche d'abord dans itemTypes
-  let itemType = itemsStore.itemTypes.find(
+  const itemType = allItemTypes.value.find(
     (type) => type.definition.id === itemTypeId
   );
 
-  // Si pas trouvé, cherche dans equipmentTypes
-  if (!itemType) {
-    itemType = itemsStore.equipmentTypes.find(
-      (type) => type.definition.id === itemTypeId
-    );
-  }
-
-  // Retourne le titre dans la langue de l'utilisateur ou un texte par défaut
   return (
     itemType?.title?.[itemsStore.userLang as keyof typeof itemType.title] ??
     "Type inconnu"
@@ -169,6 +160,10 @@ const toggleRarity = (rarity: number) => {
     selectedRarities.value.push(rarity);
   }
 };
+
+const allItemTypes = computed(() => {
+  return [...itemsStore.itemTypes, ...itemsStore.equipmentTypes];
+});
 
 const filteredItems = computed(() => {
   let items = itemsStore.items;
@@ -295,7 +290,8 @@ const paginatedItems = computed(() => {
     <p class="mt-4 text-xl">Types d'objets</p>
     <div class="grid grid-cols-8 gap-2">
       <div
-        v-for="itemType in itemsStore.itemTypes"
+        v-for="itemType in allItemTypes"
+        :key="itemType.definition.id"
         class="flex gap-2 items-center"
       >
         <Checkbox />
