@@ -94,7 +94,7 @@ export const useItemsStore = defineStore("items-store", {
           this.userLang = savedLang;
         } else {
           const browserLang = navigator.language.split("-")[0];
-          this.userLang = ["fr", "en", "es", "de", "pt"].includes(browserLang)
+          this.userLang = ["fr", "en", "es","pt"].includes(browserLang)
             ? browserLang
             : "fr";
           localStorage.setItem("lang", this.userLang);

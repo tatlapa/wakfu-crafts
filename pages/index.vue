@@ -129,6 +129,26 @@ const getItemImage = (item: any) => {
   return null;
 };
 
+const getItemTypeTitle = (itemTypeId: number): string => {
+  // Cherche d'abord dans itemTypes
+  let itemType = itemsStore.itemTypes.find(
+    (type) => type.definition.id === itemTypeId
+  );
+
+  // Si pas trouvé, cherche dans equipmentTypes
+  if (!itemType) {
+    itemType = itemsStore.equipmentTypes.find(
+      (type) => type.definition.id === itemTypeId
+    );
+  }
+
+  // Retourne le titre dans la langue de l'utilisateur ou un texte par défaut
+  return (
+    itemType?.title?.[itemsStore.userLang as keyof typeof itemType.title] ??
+    "Type inconnu"
+  );
+};
+
 const extractIdFromUrl = (url: string): number | null => {
   if (!url) return null; // Vérifier que l'URL existe
 
@@ -259,8 +279,8 @@ const paginatedItems = computed(() => {
     <div class="flex gap-2">
       <div v-for="job in itemsStore.jobs" class="flex gap-2 items-center">
         <Checkbox />
-        <label for="">{{
-          job.title[
+        <label>{{
+          job.title?.[
             itemsStore.userLang as keyof typeof job.title as
               | "en"
               | "es"
@@ -273,18 +293,25 @@ const paginatedItems = computed(() => {
 
     <!-- Liste des types d'objets -->
     <p class="mt-4 text-xl">Types d'objets</p>
-    <div class="flex gap-2">
-      <div v-for="itemType in itemsStore.itemTypes" class="flex gap-2 items-center">
+    <div class="grid grid-cols-8 gap-2">
+      <div
+        v-for="itemType in itemsStore.itemTypes"
+        class="flex gap-2 items-center"
+      >
         <Checkbox />
-        <label for="">{{
-          itemType.title[
-            itemsStore.userLang as keyof typeof itemType.title as
-              | "en"
-              | "es"
-              | "fr"
-              | "pt"
-          ] ?? "Nom du type non disponible"
-        }}</label>
+        <label>
+          {{
+            (
+              itemType.title?.[
+                itemsStore.userLang as keyof typeof itemType.title as
+                  | "en"
+                  | "es"
+                  | "fr"
+                  | "pt"
+              ] || "Nom du type non disponible"
+            ).replace(/\{\[~1\]\?s:\}|\{\[~1\]\?x:\}/g, "")
+          }}
+        </label>
       </div>
     </div>
 
@@ -354,6 +381,15 @@ const paginatedItems = computed(() => {
             }}
           </CardTitle>
         </CardHeader>
+
+        <CardContent>
+          Type :
+          {{
+            getItemTypeTitle(
+              item.definition.item.baseParameters.itemTypeId
+            ).replace(/\{\[~1\]\?s:\}|\{\[~1\]\?x:\}/g, "")
+          }}
+        </CardContent>
 
         <CardContent> Niveau {{ item.definition.item.level }} </CardContent>
         <CardContent> ID {{ item.definition.item.id }} </CardContent>
