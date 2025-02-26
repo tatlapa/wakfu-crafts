@@ -162,8 +162,25 @@ const toggleRarity = (rarity: number) => {
 };
 
 const allItemTypes = computed(() => {
-  return [...itemsStore.itemTypes, ...itemsStore.equipmentTypes];
+  const combinedItems = [...itemsStore.itemTypes, ...itemsStore.equipmentTypes];
+
+  // Utiliser un Map pour conserver uniquement le dernier élément avec chaque ID
+  const uniqueItemsMap = new Map();
+
+  combinedItems.forEach((item) => {
+    if (item.title && item.title.fr) {
+      uniqueItemsMap.set(
+        item.title.fr.replace(/\{\[~1\]\?s:\}|\{\[~1\]\?x:\}/g, ""),
+        item
+      );
+    }
+  });
+
+  // Convertir le Map en tableau
+  return Array.from(uniqueItemsMap.values());
 });
+
+console.log(allItemTypes.value);
 
 const filteredItems = computed(() => {
   let items = itemsStore.items;
