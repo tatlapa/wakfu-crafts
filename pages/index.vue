@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useItemsStore } from "~/stores/items";
 import { ref, computed, onMounted } from "vue";
-import { Search } from "lucide-vue-next";
+import { Search, ClipboardCopy, Check} from "lucide-vue-next";
 import {
   Pagination,
   PaginationEllipsis,
@@ -12,6 +12,12 @@ import {
   PaginationNext,
   PaginationPrev,
 } from "@/components/ui/pagination";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@/components/ui/tooltip'
 import iconCommon from "~/assets/icons/rarity/common.png";
 import iconRare from "~/assets/icons/rarity/rare.png";
 import iconMythical from "~/assets/icons/rarity/mythic.png";
@@ -256,6 +262,19 @@ watch(
     currentPage.value = 1;
   }
 );
+
+const copiedItemId = ref<number | null>(null);
+
+const copyItemTitle = (title: string, id: number) => {
+  navigator.clipboard.writeText(title)
+    .then(() => {
+      copiedItemId.value = id;
+      setTimeout(() => copiedItemId.value = null, 2000); // Réinitialise après 2 sec
+    })
+    .catch((err) => {
+      console.error("Erreur lors de la copie du titre : ", err);
+    });
+};
 </script>
 
 <template>
@@ -417,25 +436,42 @@ watch(
           />
 
           <CardTitle class="flex gap-2 items-center">
-            <img
-              :src="
-                rarityArray.find(
-                  (rarity) =>
-                    rarity.rarity === item.definition.item.baseParameters.rarity
-                )?.icon
-              "
-              alt="Rarity Icon"
-            />
-            {{
-              item.title[
-                itemsStore.userLang as keyof typeof item.title as
-                  | "en"
-                  | "es"
-                  | "fr"
-                  | "pt"
-              ] ?? "Nom de l'objet non disponible"
-            }}
-          </CardTitle>
+  <img
+    :src="
+      rarityArray.find(
+        (rarity) => rarity.rarity === item.definition.item.baseParameters.rarity
+      )?.icon
+    "
+    alt="Rarity Icon"
+  />
+  {{
+    item.title[itemsStore.userLang as keyof typeof item.title] ??
+    "Nom de l'objet non disponible"
+  }}
+  
+  <TooltipProvider>
+  <Tooltip>
+    <TooltipTrigger as-child>
+      <Button
+        variant="ghost"
+        size="sm"
+        class="p-2"
+        @click="copyItemTitle(item.title[itemsStore.userLang as keyof typeof item.title] ?? 'Nom inconnu', item.definition.item.id)"
+      >
+        <Check v-if="copiedItemId === item.definition.item.id" class="w-4 h-4 text-green-500" />
+        <ClipboardCopy v-else class="w-4 h-4" />
+      </Button>
+    </TooltipTrigger>
+    <TooltipContent>
+      <span v-if="copiedItemId === item.definition.item.id" class="text-xs text-green-500">Copié !</span>
+      <span v-else class="text-xs">Copier</span>
+    </TooltipContent>
+  </Tooltip>
+</TooltipProvider>
+
+</CardTitle>
+
+
         </CardHeader>
 
         <CardContent>
