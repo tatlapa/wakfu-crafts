@@ -445,7 +445,7 @@ const copyItemTitle = (title: string, id: number) => {
     alt="Rarity Icon"
   />
   {{
-    item.title[itemsStore.userLang as keyof typeof item.title] ??
+    item.title[itemsStore.userLang as 'en' | 'es' | 'fr' | 'pt'] ??
     "Nom de l'objet non disponible"
   }}
   
@@ -456,7 +456,7 @@ const copyItemTitle = (title: string, id: number) => {
         variant="ghost"
         size="sm"
         class="p-2"
-        @click="copyItemTitle(item.title[itemsStore.userLang as keyof typeof item.title] ?? 'Nom inconnu', item.definition.item.id)"
+        @click="copyItemTitle(item.title[itemsStore.userLang as 'en' | 'es' | 'fr' | 'pt'] ?? 'Nom inconnu', item.definition.item.id)"
       >
         <Check v-if="copiedItemId === item.definition.item.id" class="w-4 h-4 text-green-500" />
         <ClipboardCopy v-else class="w-4 h-4" />
