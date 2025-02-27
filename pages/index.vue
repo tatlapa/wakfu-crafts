@@ -28,6 +28,7 @@ const itemsPerPage = 12;
 const hideDroppable = ref(false);
 const droppableItemsSet = ref<Set<number>>(new Set());
 const levelRange = ref<[number, number]>([0, 245]); // Plage initiale de niveaux
+const selectedItemTypes = ref<number[]>([]); // Pour stocker les types d'items sélectionnés
 
 const rarityArray = [
   {
@@ -161,6 +162,19 @@ const toggleRarity = (rarity: number) => {
   }
 };
 
+// Fonction pour basculer la sélection d'un type d'item
+const toggleItemType = (typeId: number) => {
+  if (selectedItemTypes.value.includes(typeId)) {
+    selectedItemTypes.value = selectedItemTypes.value.filter(
+      (id) => id !== typeId
+    );
+  } else {
+    selectedItemTypes.value.push(typeId);
+  }
+  // Réinitialiser la pagination lorsqu'un filtre change
+  currentPage.value = 1;
+};
+
 const allItemTypes = computed(() => {
   const combinedItems = [...itemsStore.itemTypes, ...itemsStore.equipmentTypes];
 
@@ -179,8 +193,6 @@ const allItemTypes = computed(() => {
   // Convertir le Map en tableau
   return Array.from(uniqueItemsMap.values());
 });
-
-console.log(allItemTypes.value);
 
 const filteredItems = computed(() => {
   let items = itemsStore.items;
@@ -204,6 +216,15 @@ const filteredItems = computed(() => {
     );
   }
 
+  // Filtre par type d'item
+  if (selectedItemTypes.value.length > 0) {
+    items = items.filter((item) =>
+      selectedItemTypes.value.includes(
+        item.definition.item.baseParameters.itemTypeId
+      )
+    );
+  }
+
   // Filtre pour cacher les objets droppables (si activé)
   if (hideDroppable.value) {
     items = items.filter((item) => !isItemDroppable(item));
@@ -216,7 +237,7 @@ const filteredItems = computed(() => {
       item.definition.item.level <= levelRange.value[1]
   );
 
-  // 🏆 **Tri par niveau décroissant**
+  // Tri par niveau décroissant
   items.sort((a, b) => b.definition.item.level - a.definition.item.level);
 
   return items;
@@ -227,6 +248,14 @@ const paginatedItems = computed(() => {
   const end = start + itemsPerPage;
   return filteredItems.value.slice(start, end);
 });
+
+// Réinitialiser la pagination quand les filtres changent
+watch(
+  [searchQuery, selectedRarities, hideDroppable, levelRange, selectedItemTypes],
+  () => {
+    currentPage.value = 1;
+  }
+);
 </script>
 
 <template>
@@ -261,7 +290,6 @@ const paginatedItems = computed(() => {
     </div>
 
     <!-- CheckBox Hide Droppable -->
-
     <div class="flex items-center gap-2">
       <Checkbox
         id="hideDroppable"
@@ -288,10 +316,14 @@ const paginatedItems = computed(() => {
 
     <!-- Liste des métiers -->
     <p class="mt-4 text-xl">Métiers</p>
-    <div class="flex gap-2">
-      <div v-for="job in itemsStore.jobs" class="flex gap-2 items-center">
+    <div class="flex flex-wrap gap-4 mb-4">
+      <div
+        v-for="job in itemsStore.jobs"
+        :key="job.definition.id"
+        class="flex gap-2 items-center"
+      >
         <Checkbox />
-        <label>{{
+        <label class="cursor-pointer">{{
           job.title?.[
             itemsStore.userLang as keyof typeof job.title as
               | "en"
@@ -303,16 +335,19 @@ const paginatedItems = computed(() => {
       </div>
     </div>
 
-    <!-- Liste des types d'objets -->
+    <!-- Liste des types d'objets avec filtrage actif -->
     <p class="mt-4 text-xl">Types d'objets</p>
-    <div class="grid grid-cols-8 gap-2">
+    <div class="grid grid-cols-4 gap-4 mb-6">
       <div
         v-for="itemType in allItemTypes"
         :key="itemType.definition.id"
         class="flex gap-2 items-center"
       >
-        <Checkbox />
-        <label>
+        <Checkbox
+          :checked="selectedItemTypes.includes(itemType.definition.id)"
+          @update:checked="toggleItemType(itemType.definition.id)"
+        />
+        <label class="cursor-pointer">
           {{
             (
               itemType.title?.[
@@ -328,8 +363,16 @@ const paginatedItems = computed(() => {
       </div>
     </div>
 
+    <!-- Statistiques des résultats -->
+    <div class="mb-4 text-sm text-muted-foreground">
+      {{ filteredItems.length }} items trouvés
+      <span v-if="selectedItemTypes.length > 0">
+        ({{ selectedItemTypes.length }} types sélectionnés)
+      </span>
+    </div>
+
     <!-- Liste des objets -->
-    <h1 class="text-3xl font-bold">Liste des objets</h1>
+    <h1 class="text-3xl font-bold mb-4">Liste des objets</h1>
     <div
       v-if="itemsStore.loading"
       class="grid grid-cols-1 gap-4 mt-4 md:grid-cols-2 lg:grid-cols-3"
@@ -361,7 +404,7 @@ const paginatedItems = computed(() => {
       <Card
         v-for="item in paginatedItems"
         :key="item.definition.item.id"
-        class="p-4 border rounded"
+        class="p-4 border rounded hover:shadow-md transition-shadow"
       >
         <CardHeader>
           <!-- Recherche de l'image correspondant au titre de l'item -->
