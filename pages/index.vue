@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useItemsStore } from "~/stores/items";
 import { ref, computed, onMounted } from "vue";
-import { Search, ClipboardCopy, Check} from "lucide-vue-next";
+import { Search, ClipboardCopy, Check } from "lucide-vue-next";
 import {
   Pagination,
   PaginationEllipsis,
@@ -16,8 +16,8 @@ import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
-  TooltipTrigger
-} from '@/components/ui/tooltip'
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import iconCommon from "~/assets/icons/rarity/common.png";
 import iconRare from "~/assets/icons/rarity/rare.png";
 import iconMythical from "~/assets/icons/rarity/mythic.png";
@@ -26,6 +26,7 @@ import iconEpic from "~/assets/icons/rarity/epic.png";
 import iconMemory from "~/assets/icons/rarity/memory.png";
 import iconRelic from "~/assets/icons/rarity/relic.png";
 import CardContent from "~/components/ui/card/CardContent.vue";
+import { get } from "@vueuse/core";
 
 const itemsStore = useItemsStore();
 const searchQuery = ref("");
@@ -64,6 +65,7 @@ onMounted(async () => {
   await itemsStore.getEquipmentTypes();
   await itemsStore.getJobs();
   await itemsStore.loadAllCSVs();
+  await itemsStore.getItemStatistics();
 
   // Stocke les ID des objets droppables
   const droppableIds = new Set<number>();
@@ -145,6 +147,22 @@ const getItemTypeTitle = (itemTypeId: number): string => {
     itemType?.title?.[itemsStore.userLang as keyof typeof itemType.title] ??
     "Type inconnu"
   );
+};
+
+const getItemStatistics = (actionId: number, params: number[]) => {
+  const stat = itemsStore.itemStatistics.find(
+    (stat) => stat.definition.id === actionId
+  );
+
+  if (!stat) return null; // Aucune statistique trouvée
+
+  // Remplacement de [#1] par params[0]
+  const formattedDescription = stat.description?.fr.replace(
+    "[#1]",
+    params[0].toString()
+  );
+
+  return formattedDescription;
 };
 
 const extractIdFromUrl = (url: string): number | null => {
@@ -266,10 +284,11 @@ watch(
 const copiedItemId = ref<number | null>(null);
 
 const copyItemTitle = (title: string, id: number) => {
-  navigator.clipboard.writeText(title)
+  navigator.clipboard
+    .writeText(title)
     .then(() => {
       copiedItemId.value = id;
-      setTimeout(() => copiedItemId.value = null, 2000); // Réinitialise après 2 sec
+      setTimeout(() => (copiedItemId.value = null), 2000); // Réinitialise après 2 sec
     })
     .catch((err) => {
       console.error("Erreur lors de la copie du titre : ", err);
@@ -436,42 +455,54 @@ const copyItemTitle = (title: string, id: number) => {
           />
 
           <CardTitle class="flex gap-2 items-center">
-  <img
-    :src="
-      rarityArray.find(
-        (rarity) => rarity.rarity === item.definition.item.baseParameters.rarity
-      )?.icon
-    "
-    alt="Rarity Icon"
-  />
-  {{
-    item.title[itemsStore.userLang as 'en' | 'es' | 'fr' | 'pt'] ??
-    "Nom de l'objet non disponible"
-  }}
-  
-  <TooltipProvider>
-  <Tooltip>
-    <TooltipTrigger as-child>
-      <Button
-        variant="ghost"
-        size="sm"
-        class="p-2"
-        @click="copyItemTitle(item.title[itemsStore.userLang as 'en' | 'es' | 'fr' | 'pt'] ?? 'Nom inconnu', item.definition.item.id)"
-      >
-        <Check v-if="copiedItemId === item.definition.item.id" class="w-4 h-4 text-green-500" />
-        <ClipboardCopy v-else class="w-4 h-4" />
-      </Button>
-    </TooltipTrigger>
-    <TooltipContent>
-      <span v-if="copiedItemId === item.definition.item.id" class="text-xs text-green-500">Copié !</span>
-      <span v-else class="text-xs">Copier</span>
-    </TooltipContent>
-  </Tooltip>
-</TooltipProvider>
+            <img
+              :src="
+                rarityArray.find(
+                  (rarity) =>
+                    rarity.rarity === item.definition.item.baseParameters.rarity
+                )?.icon
+              "
+              alt="Rarity Icon"
+            />
+            {{
+              item.title[itemsStore.userLang as "en" | "es" | "fr" | "pt"] ??
+              "Nom de l'objet non disponible"
+            }}
 
-</CardTitle>
-
-
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger as-child>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    class="p-2"
+                    @click="
+                      copyItemTitle(
+                        item.title[
+                          itemsStore.userLang as 'en' | 'es' | 'fr' | 'pt'
+                        ] ?? 'Nom inconnu',
+                        item.definition.item.id
+                      )
+                    "
+                  >
+                    <Check
+                      v-if="copiedItemId === item.definition.item.id"
+                      class="w-4 h-4 text-green-500"
+                    />
+                    <ClipboardCopy v-else class="w-4 h-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <span
+                    v-if="copiedItemId === item.definition.item.id"
+                    class="text-xs text-green-500"
+                    >Copié !</span
+                  >
+                  <span v-else class="text-xs">Copier</span>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </CardTitle>
         </CardHeader>
 
         <CardContent>
@@ -485,6 +516,17 @@ const copyItemTitle = (title: string, id: number) => {
 
         <CardContent> Niveau {{ item.definition.item.level }} </CardContent>
         <CardContent> ID {{ item.definition.item.id }} </CardContent>
+        <CardContent
+          v-for="effect in item.definition.equipEffects"
+          :key="effect.effect.definition.id"
+        >
+          {{
+            getItemStatistics(
+              effect.effect.definition.actionId,
+              effect.effect.definition.params
+            )
+          }}
+        </CardContent>
       </Card>
     </div>
 

@@ -8,6 +8,7 @@ export const useItemsStore = defineStore("items-store", {
     itemTypes: [] as any[], // Liste complète des types d'objets
     equipmentTypes: [] as any[], // Liste des types d'équipements
     jobs: [] as any[], // Liste des métiers
+    itemStatistics: [] as any[], // Liste des statistiques des objets
     userLang: "fr", // Langue de l'utilisateur (par défaut : français)
     loading: false,
     armures: [] as any[], // Stocke les armures
@@ -86,6 +87,26 @@ export const useItemsStore = defineStore("items-store", {
         return false;
       }
     },
+    async getItemStatistics() {
+      try {
+        const version = "1.85.1.29";
+        const proxyUrl = "http://localhost:8080/";
+        const itemStatisticsUrl = `${proxyUrl}https://wakfu.cdn.ankama.com/gamedata/${version}/actions.json`;
+
+        this.itemStatistics = await $fetch<any[]>(itemStatisticsUrl);
+        console.log(
+          "Récupération des statistiques d'items :",
+          this.itemStatistics
+        );
+        return true;
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération des statistiques d'items :",
+          error
+        );
+        return false;
+      }
+    },
     getUserLang() {
       try {
         const savedLang = localStorage.getItem("lang");
@@ -94,7 +115,7 @@ export const useItemsStore = defineStore("items-store", {
           this.userLang = savedLang;
         } else {
           const browserLang = navigator.language.split("-")[0];
-          this.userLang = ["fr", "en", "es","pt"].includes(browserLang)
+          this.userLang = ["fr", "en", "es", "pt"].includes(browserLang)
             ? browserLang
             : "fr";
           localStorage.setItem("lang", this.userLang);
