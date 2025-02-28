@@ -156,13 +156,11 @@ const getItemStatistics = (actionId: number, params: number[]) => {
 
   if (!stat) return null; // Aucune statistique trouvée
 
-  // Remplacement de [#1] par params[0]
-  const formattedDescription = stat.description?.fr.replace(
-    "[#1]",
-    params[0].toString()
-  );
+  const description =
+    stat.description[itemsStore.userLang as "fr" | "en" | "es" | "pt"];
 
-  return formattedDescription;
+  // Remplacement de [#1] par params[0] s'il existe
+  return description.replace("[#1]", params[0]?.toString() ?? "?");
 };
 
 const extractIdFromUrl = (url: string): number | null => {
