@@ -2,22 +2,6 @@
 import { useItemsStore } from "~/stores/items";
 import { ref, computed, onMounted } from "vue";
 import { Search, ClipboardCopy, Check } from "lucide-vue-next";
-import {
-  Pagination,
-  PaginationEllipsis,
-  PaginationFirst,
-  PaginationLast,
-  PaginationList,
-  PaginationListItem,
-  PaginationNext,
-  PaginationPrev,
-} from "@/components/ui/pagination";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import iconCommon from "~/assets/icons/rarity/common.png";
 import iconRare from "~/assets/icons/rarity/rare.png";
 import iconMythical from "~/assets/icons/rarity/mythic.png";
@@ -26,8 +10,8 @@ import iconEpic from "~/assets/icons/rarity/epic.png";
 import iconMemory from "~/assets/icons/rarity/memory.png";
 import iconRelic from "~/assets/icons/rarity/relic.png";
 import CardContent from "~/components/ui/card/CardContent.vue";
-import { get } from "@vueuse/core";
 
+// const props = defineProps<{ searchQuery: string }>(); // Récupération du searchQuery
 const itemsStore = useItemsStore();
 const searchQuery = ref("");
 const currentPage = ref(1);
@@ -218,7 +202,6 @@ const allItemTypes = computed(() => {
 
 const filteredItems = computed(() => {
   let items = itemsStore.items;
-
   // Filtre par recherche
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
@@ -296,8 +279,7 @@ const copyItemTitle = (title: string, id: number) => {
 
 <template>
   <div class="mx-12">
-    <!-- Barre de recherche -->
-    <div class="flex items-center justify-between mb-6">
+    <!-- <div class="flex items-center justify-between mb-6">
       <div class="relative">
         <Search
           class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground"
@@ -323,7 +305,7 @@ const copyItemTitle = (title: string, id: number) => {
           {{ rarity.label }}
         </Button>
       </div>
-    </div>
+    </div> -->
 
     <!-- CheckBox Hide Droppable -->
     <div class="flex items-center gap-2">
