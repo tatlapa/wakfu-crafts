@@ -115,6 +115,8 @@ const getItemStatistics = (actionId: number, params: number[]) => {
     (stat) => stat.definition.id === actionId
   );
 
+  console.log("Stat:", stat);
+
   if (!stat) return null; // Aucune statistique trouvée
 
   let description =
@@ -123,17 +125,19 @@ const getItemStatistics = (actionId: number, params: number[]) => {
   console.log("Original description:", description);
   console.log("Params:", params);
 
-  // Remplacement des placeholders comme dans ton code d'origine
   description = description
     .replace("[#1]", params[0]?.toString() ?? "?")
     .replace("[#2]", params[2]?.toString() ?? "?")
+    .replace("{[~2]?%:}", params[4]?.toString() ?? "?")
+    .replace("121", "% Armure Reçue")
+    .replace("120", "% Armure Donnée")
     .replace("[el1]", "feu")
     .replace("[el2]", "eau")
     .replace("[el3]", "terre")
     .replace("[el4]", "air");
 
   // Suppression des blocs inutiles {[...]? ...} en gardant uniquement le texte utile
-  description = description.replace(/\[[^\]]*\]/g, "");
+  description = description.replace(/\[[^\]]*\]/g, "").replace("{?s:}", "");
 
   console.log("Cleaned description:", description);
   return description;
