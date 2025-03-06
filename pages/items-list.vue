@@ -10,6 +10,7 @@ import iconEpic from "~/assets/icons/rarity/epic.png";
 import iconMemory from "~/assets/icons/rarity/memory.png";
 import iconRelic from "~/assets/icons/rarity/relic.png";
 import CardContent from "~/components/ui/card/CardContent.vue";
+import { ColorScheme } from "#components";
 
 definePageMeta({
   layout: "aside",
@@ -27,21 +28,24 @@ const rarityArray = [
     label: "Commun",
     icon: iconCommon,
     rarity: 1,
+    color: "#dd7f13",
   },
-  { label: "Rare", icon: iconRare, rarity: 2 },
+  { label: "Rare", icon: iconRare, rarity: 2, color: "#dd7f13" },
   {
     label: "Mythique",
     icon: iconMythical,
     rarity: 3,
+    color: "#dd7f13",
   },
   {
     label: "Légendaire",
     icon: iconLegendary,
     rarity: 4,
+    color: "#dd7f13",
   },
-  { label: "Relique", icon: iconRelic, rarity: 5 },
-  { label: "Souvenir", icon: iconMemory, rarity: 6 },
-  { label: "Épique", icon: iconEpic, rarity: 7 },
+  { label: "Relique", icon: iconRelic, rarity: 5, color: "#dd7f13" },
+  { label: "Souvenir", icon: iconMemory, rarity: 6, color: "#dd7f13" },
+  { label: "Épique", icon: iconEpic, rarity: 7, color: "#dd7f13" },
 ];
 
 onMounted(async () => {
@@ -113,11 +117,26 @@ const getItemStatistics = (actionId: number, params: number[]) => {
 
   if (!stat) return null; // Aucune statistique trouvée
 
-  const description =
+  let description =
     stat.description[itemsStore.userLang as "fr" | "en" | "es" | "pt"];
 
-  // Remplacement de [#1] par params[0] s'il existe
-  return description.replace("[#1]", params[0]?.toString() ?? "?");
+  console.log("Original description:", description);
+  console.log("Params:", params);
+
+  // Remplacement des placeholders comme dans ton code d'origine
+  description = description
+    .replace("[#1]", params[0]?.toString() ?? "?")
+    .replace("[#2]", params[2]?.toString() ?? "?")
+    .replace("[el1]", "feu")
+    .replace("[el2]", "eau")
+    .replace("[el3]", "terre")
+    .replace("[el4]", "air");
+
+  // Suppression des blocs inutiles {[...]? ...} en gardant uniquement le texte utile
+  description = description.replace(/\[[^\]]*\]/g, "");
+
+  console.log("Cleaned description:", description);
+  return description;
 };
 
 const allItemTypes = computed(() => {
@@ -164,7 +183,7 @@ const copyItemTitle = (title: string, id: number) => {
 </script>
 
 <template>
-  <div class="mx-12">
+  <div class="w-2/3">
     <!-- Statistiques des résultats -->
     <div class="mb-4 text-sm text-muted-foreground">
       {{ $filteredItems.length }} items trouvés

@@ -164,128 +164,130 @@ useNuxtApp().provide("filteredItems", filteredItems);
 </script>
 
 <template>
-  <Card class="bg-muted-foreground/[0.03]">
-    <CardHeader class="p-4">Filtrer la liste</CardHeader>
+  <aside class="w-1/3">
+    <Card class="bg-muted-foreground/[0.03]">
+      <CardHeader class="p-4">Filtrer la liste</CardHeader>
 
-    <!-- Barre de recherche -->
-    <CardContent class="p-4 space-y-3">
-      <div class="relative w-full">
-        <Search
-          class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground"
-        />
-        <input
-          v-model="searchQuery"
-          class="w-full pl-10 p-2 border rounded-lg"
-          placeholder="Rechercher un item..."
-        />
-      </div>
-    </CardContent>
+      <!-- Barre de recherche -->
+      <CardContent class="p-4 space-y-3">
+        <div class="relative w-full">
+          <Search
+            class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground"
+          />
+          <input
+            v-model="searchQuery"
+            class="w-full pl-10 p-2 border rounded-lg"
+            placeholder="Rechercher un item..."
+          />
+        </div>
+      </CardContent>
 
-    <!-- CheckBox Hide Droppable -->
-    <CardContent class="flex items-center gap-2">
-      <Checkbox
-        id="hideDroppable"
-        v-model:checked="hideDroppable"
-        class="w-5 h-5"
-      />
-      <label for="hideDroppable" class="text-sm cursor-pointer">
-        Cacher les objets droppables
-      </label>
-    </CardContent>
-
-    <!-- Filtre par rareté avec Toggle -->
-    <CardHeader class="p-4">Rareté</CardHeader>
-    <CardContent class="flex p-4 gap-2">
-      <TooltipProvider>
-        <Tooltip v-for="rarity in rarityArray" :key="rarity.rarity">
-          <TooltipTrigger as-child>
-            <Toggle
-              :pressed="selectedRarities.includes(rarity.rarity)"
-              @click="toggleRarity(rarity.rarity)"
-              class="flex items-center justify-center p-2 rounded-lg transition-all duration-300 border-2 hover:scale-105 hover:ring-2 hover:ring-blue-300"
-              :class="{
-                'bg-blue-500 border-blue-700 text-white shadow-md':
-                  selectedRarities.includes(rarity.rarity),
-                'bg-gray-100 border-gray-300 text-gray-500 hover:bg-gray-200':
-                  !selectedRarities.includes(rarity.rarity),
-              }"
-            >
-              <img
-                :src="rarity.icon"
-                alt="Rarity Icon"
-                class="transition-opacity duration-300"
-                :class="{
-                  'opacity-100': selectedRarities.includes(rarity.rarity),
-                  'opacity-60': !selectedRarities.includes(rarity.rarity),
-                }"
-              />
-            </Toggle>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{{ rarity.label }}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    </CardContent>
-
-    <CardContent class="mt-3">
-      <div class="mb-2">Niveau {{ levelRange[0] }} - {{ levelRange[1] }}</div>
-      <Slider
-        v-model="levelRange"
-        :min="0"
-        :max="245"
-        :step="1"
-        :range="true"
-      />
-    </CardContent>
-
-    <!-- Liste des types d'objets avec filtrage actif -->
-    <CardHeader class="p-4">Types d'objets</CardHeader>
-    <CardContent class="grid grid-cols-2 gap-4 mb-6">
-      <div
-        v-for="itemType in allItemTypes"
-        :key="itemType.definition.id"
-        class="flex gap-2 items-center"
-      >
+      <!-- CheckBox Hide Droppable -->
+      <CardContent class="flex items-center gap-2">
         <Checkbox
-          :checked="selectedItemTypes.includes(itemType.definition.id)"
-          @update:checked="toggleItemType(itemType.definition.id)"
+          id="hideDroppable"
+          v-model:checked="hideDroppable"
+          class="w-5 h-5"
         />
-        <label class="cursor-pointer">
-          {{
-            (
-              itemType.title?.[
-                itemsStore.userLang as keyof typeof itemType.title as
-                  | "en"
-                  | "es"
-                  | "fr"
-                  | "pt"
-              ] || "Nom du type non disponible"
-            ).replace(/\{\[~1\]\?s:\}|\{\[~1\]\?x:\}/g, "")
-          }}
+        <label for="hideDroppable" class="text-sm cursor-pointer">
+          Cacher les objets droppables
         </label>
-      </div>
-    </CardContent>
+      </CardContent>
 
-    <!-- Liste des métiers -->
-    <CardHeader class="p-4">Métiers</CardHeader>
-    <CardContent class="grid grid-cols-2 gap-4 mb-4">
-      <div
-        v-for="job in itemsStore.jobs"
-        :key="job.definition.id"
-        class="flex gap-2 items-center"
-      >
-        <Checkbox />
-        <label class="cursor-pointer">{{
-          job.title?.[
-            itemsStore.userLang as keyof typeof job.title as
-              | "en"
-              | "es"
-              | "fr"
-              | "pt"
-          ] ?? "Nom du métier non disponible"
-        }}</label>
-      </div>
-    </CardContent>
-  </Card>
+      <!-- Filtre par rareté avec Toggle -->
+      <CardHeader class="p-4">Rareté</CardHeader>
+      <CardContent class="flex p-4 gap-2">
+        <TooltipProvider>
+          <Tooltip v-for="rarity in rarityArray" :key="rarity.rarity">
+            <TooltipTrigger as-child>
+              <Toggle
+                :pressed="selectedRarities.includes(rarity.rarity)"
+                @click="toggleRarity(rarity.rarity)"
+                class="flex items-center justify-center p-2 rounded-lg transition-all duration-300 border-2 hover:scale-105 hover:ring-2 hover:ring-blue-300"
+                :class="{
+                  'bg-blue-500 border-blue-700 text-white shadow-md':
+                    selectedRarities.includes(rarity.rarity),
+                  'bg-gray-100 border-gray-300 text-gray-500 hover:bg-gray-200':
+                    !selectedRarities.includes(rarity.rarity),
+                }"
+              >
+                <img
+                  :src="rarity.icon"
+                  alt="Rarity Icon"
+                  class="transition-opacity duration-300"
+                  :class="{
+                    'opacity-100': selectedRarities.includes(rarity.rarity),
+                    'opacity-60': !selectedRarities.includes(rarity.rarity),
+                  }"
+                />
+              </Toggle>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{{ rarity.label }}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </CardContent>
+
+      <CardContent class="mt-3">
+        <div class="mb-2">Niveau {{ levelRange[0] }} - {{ levelRange[1] }}</div>
+        <Slider
+          v-model="levelRange"
+          :min="0"
+          :max="245"
+          :step="1"
+          :range="true"
+        />
+      </CardContent>
+
+      <!-- Liste des types d'objets avec filtrage actif -->
+      <CardHeader class="p-4">Types d'objets</CardHeader>
+      <CardContent class="grid grid-cols-2 gap-4 mb-6">
+        <div
+          v-for="itemType in allItemTypes"
+          :key="itemType.definition.id"
+          class="flex gap-2 items-center"
+        >
+          <Checkbox
+            :checked="selectedItemTypes.includes(itemType.definition.id)"
+            @update:checked="toggleItemType(itemType.definition.id)"
+          />
+          <label class="cursor-pointer">
+            {{
+              (
+                itemType.title?.[
+                  itemsStore.userLang as keyof typeof itemType.title as
+                    | "en"
+                    | "es"
+                    | "fr"
+                    | "pt"
+                ] || "Nom du type non disponible"
+              ).replace(/\{\[~1\]\?s:\}|\{\[~1\]\?x:\}/g, "")
+            }}
+          </label>
+        </div>
+      </CardContent>
+
+      <!-- Liste des métiers -->
+      <CardHeader class="p-4">Métiers</CardHeader>
+      <CardContent class="grid grid-cols-2 gap-4 mb-4">
+        <div
+          v-for="job in itemsStore.jobs"
+          :key="job.definition.id"
+          class="flex gap-2 items-center"
+        >
+          <Checkbox />
+          <label class="cursor-pointer">{{
+            job.title?.[
+              itemsStore.userLang as keyof typeof job.title as
+                | "en"
+                | "es"
+                | "fr"
+                | "pt"
+            ] ?? "Nom du métier non disponible"
+          }}</label>
+        </div>
+      </CardContent>
+    </Card>
+  </aside>
 </template>
