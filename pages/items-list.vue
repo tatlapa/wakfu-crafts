@@ -115,15 +115,10 @@ const getItemStatistics = (actionId: number, params: number[]) => {
     (stat) => stat.definition.id === actionId
   );
 
-  console.log("Stat:", stat);
-
   if (!stat) return null; // Aucune statistique trouvée
 
   let description =
     stat.description[itemsStore.userLang as "fr" | "en" | "es" | "pt"];
-
-  console.log("Original description:", description);
-  console.log("Params:", params);
 
   description = description
     .replace("[#1]", params[0]?.toString() ?? "?")
@@ -146,7 +141,6 @@ const getItemStatistics = (actionId: number, params: number[]) => {
       return match.replace(/^\{[\?~>]/, "").replace(/\}$/, "");
     });
 
-  console.log("Cleaned description:", description);
   return description;
 };
 

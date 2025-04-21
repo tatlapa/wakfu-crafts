@@ -25,7 +25,6 @@ export const useItemsStore = defineStore("items-store", {
         const itemsUrl = `/api/proxy/items.json`;
 
         this.items = await $fetch<any[]>(itemsUrl);
-        console.log("Récupération des objets :", this.items);
         return true;
       } catch (error) {
         console.error("Erreur lors de la récupération des objets :", error);
@@ -39,7 +38,6 @@ export const useItemsStore = defineStore("items-store", {
         const itemTypesUrl = `/api/proxy/itemTypes.json`;
 
         this.itemTypes = await $fetch<any[]>(itemTypesUrl);
-        console.log("Récupération des types d'objets :", this.itemTypes);
         return true;
       } catch (error) {
         console.error(
@@ -54,10 +52,6 @@ export const useItemsStore = defineStore("items-store", {
         const equipmentTypesUrl = `/api/proxy/equipmentItemTypes.json`;
 
         this.equipmentTypes = await $fetch<any[]>(equipmentTypesUrl);
-        console.log(
-          "Récupération des types d'équipement :",
-          this.equipmentTypes
-        );
         return true;
       } catch (error) {
         console.error(
@@ -72,7 +66,6 @@ export const useItemsStore = defineStore("items-store", {
         const jobsUrl = `/api/proxy/recipeCategories.json`;
 
         this.jobs = await $fetch<any[]>(jobsUrl);
-        console.log("Récupération des métiers :", this.jobs);
         return true;
       } catch (error) {
         console.error("Erreur lors de la récupération des métiers :", error);
@@ -84,10 +77,6 @@ export const useItemsStore = defineStore("items-store", {
         const itemStatisticsUrl = `/api/proxy/actions.json`;
 
         this.itemStatistics = await $fetch<any[]>(itemStatisticsUrl);
-        console.log(
-          "Récupération des statistiques d'items :",
-          this.itemStatistics
-        );
         return true;
       } catch (error) {
         console.error(

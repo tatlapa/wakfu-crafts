@@ -10,7 +10,6 @@ onMounted(() => {
 const setLanguage = (lang: string) => {
   itemsStore.userLang = lang;
   localStorage.setItem("lang", lang);
-  console.log("Langue modifiée :", lang);
 };
 </script>
 
