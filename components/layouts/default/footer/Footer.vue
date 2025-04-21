@@ -7,7 +7,7 @@
     <div class="flex flex-col items-center gap-4">
       <!-- Discord Link -->
       <a
-        href="https://discord.gg/VDpxMHUp49"
+        href="#"
         class="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
         target="_blank"
         rel="noopener noreferrer"

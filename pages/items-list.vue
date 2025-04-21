@@ -137,7 +137,14 @@ const getItemStatistics = (actionId: number, params: number[]) => {
     .replace("[el4]", "air");
 
   // Suppression des blocs inutiles {[...]? ...} en gardant uniquement le texte utile
-  description = description.replace(/\[[^\]]*\]/g, "").replace("{?s:}", "");
+  description = description
+    .replace(/\[[^\]]*\]/g, "") // Supprime les crochets et leur contenu
+    .replace(/\{[\?~>][^}]*\}/g, (match) => {
+      // Si c'est un bloc de pluralisation, on le supprime
+      if (match.includes("?s:")) return "";
+      // Sinon on garde le contenu entre les accolades
+      return match.replace(/^\{[\?~>]/, "").replace(/\}$/, "");
+    });
 
   console.log("Cleaned description:", description);
   return description;

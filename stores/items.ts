@@ -22,9 +22,7 @@ export const useItemsStore = defineStore("items-store", {
     async getItems() {
       this.loading = true;
       try {
-        const version = "1.85.1.29";
-        const proxyUrl = "http://localhost:8080/";
-        const itemsUrl = `${proxyUrl}https://wakfu.cdn.ankama.com/gamedata/${version}/items.json`;
+        const itemsUrl = `/api/proxy/items.json`;
 
         this.items = await $fetch<any[]>(itemsUrl);
         console.log("Récupération des objets :", this.items);
@@ -38,9 +36,7 @@ export const useItemsStore = defineStore("items-store", {
     },
     async getItemTypes() {
       try {
-        const version = "1.85.1.29";
-        const proxyUrl = "http://localhost:8080/";
-        const itemTypesUrl = `${proxyUrl}https://wakfu.cdn.ankama.com/gamedata/${version}/itemTypes.json`;
+        const itemTypesUrl = `/api/proxy/itemTypes.json`;
 
         this.itemTypes = await $fetch<any[]>(itemTypesUrl);
         console.log("Récupération des types d'objets :", this.itemTypes);
@@ -55,9 +51,7 @@ export const useItemsStore = defineStore("items-store", {
     },
     async getEquipmentTypes() {
       try {
-        const version = "1.85.1.29";
-        const proxyUrl = "http://localhost:8080/";
-        const equipmentTypesUrl = `${proxyUrl}https://wakfu.cdn.ankama.com/gamedata/${version}/equipmentItemTypes.json`;
+        const equipmentTypesUrl = `/api/proxy/equipmentItemTypes.json`;
 
         this.equipmentTypes = await $fetch<any[]>(equipmentTypesUrl);
         console.log(
@@ -75,9 +69,7 @@ export const useItemsStore = defineStore("items-store", {
     },
     async getJobs() {
       try {
-        const version = "1.85.1.29";
-        const proxyUrl = "http://localhost:8080/";
-        const jobsUrl = `${proxyUrl}https://wakfu.cdn.ankama.com/gamedata/${version}/recipeCategories.json`;
+        const jobsUrl = `/api/proxy/recipeCategories.json`;
 
         this.jobs = await $fetch<any[]>(jobsUrl);
         console.log("Récupération des métiers :", this.jobs);
@@ -89,9 +81,7 @@ export const useItemsStore = defineStore("items-store", {
     },
     async getItemStatistics() {
       try {
-        const version = "1.85.1.29";
-        const proxyUrl = "http://localhost:8080/";
-        const itemStatisticsUrl = `${proxyUrl}https://wakfu.cdn.ankama.com/gamedata/${version}/actions.json`;
+        const itemStatisticsUrl = `/api/proxy/actions.json`;
 
         this.itemStatistics = await $fetch<any[]>(itemStatisticsUrl);
         console.log(

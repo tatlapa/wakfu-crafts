@@ -15,7 +15,7 @@ const setLanguage = (lang: string) => {
 </script>
 
 <template>
-  <div class="flex justify-between w-full items-center p-2 bg-black text-black">
+  <div class="flex justify-between w-full items-center px-8 py-3 bg-black text-black">
     <h1 class="text-white">Wakfu Crafter</h1>
     <div class="w-32">
       <Select v-model="itemsStore.userLang" @update:modelValue="setLanguage">
