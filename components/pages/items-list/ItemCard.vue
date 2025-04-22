@@ -88,7 +88,14 @@ const itemTitle = computed(
       </Card>
     </HoverCardTrigger>
     <HoverCardContent
-      ><div
+      :borderColor="
+        rarityArray.find(
+          (rarity) =>
+            rarity.rarity === item.definition.item.baseParameters.rarity
+        )?.color
+      "
+    >
+      <div
         v-for="effect in item.definition.equipEffects"
         :key="effect.effect.definition.id"
       >

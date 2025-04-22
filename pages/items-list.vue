@@ -28,9 +28,9 @@ const rarityArray = [
     label: "Commun",
     icon: iconCommon,
     rarity: 1,
-    color: "#dd7f13",
+    color: "#fff",
   },
-  { label: "Rare", icon: iconRare, rarity: 2, color: "#dd7f13" },
+  { label: "Rare", icon: iconRare, rarity: 2, color: "#4c9646" },
   {
     label: "Mythique",
     icon: iconMythical,
@@ -41,11 +41,11 @@ const rarityArray = [
     label: "Légendaire",
     icon: iconLegendary,
     rarity: 4,
-    color: "#dd7f13",
+    color: "#ffef64",
   },
-  { label: "Relique", icon: iconRelic, rarity: 5, color: "#dd7f13" },
-  { label: "Souvenir", icon: iconMemory, rarity: 6, color: "#dd7f13" },
-  { label: "Épique", icon: iconEpic, rarity: 7, color: "#dd7f13" },
+  { label: "Relique", icon: iconRelic, rarity: 5, color: "#c570ef" },
+  { label: "Souvenir", icon: iconMemory, rarity: 6, color: "#80d6d4" },
+  { label: "Épique", icon: iconEpic, rarity: 7, color: "#eebcd7" },
 ];
 
 onMounted(async () => {
@@ -124,22 +124,22 @@ const getItemStatistics = (actionId: number, params: number[]) => {
     .replace("[#1]", params[0]?.toString() ?? "?")
     .replace("[#2]", params[2]?.toString() ?? "?")
     .replace("{[~2]?%:}", params[4]?.toString() ?? "?")
-    .replace("121", "% Armure Reçue")
-    .replace("120", "% Armure Donnée")
-    .replace("[el1]", "feu")
+    .replace(/(\d+)121(?!\d)/g, "$1% Armure Reçue")
+    .replace(/(\d+)120(?!\d)/g, "$1% Armure Donnée")
     .replace("[el2]", "eau")
     .replace("[el3]", "terre")
-    .replace("[el4]", "air");
-
-  // Suppression des blocs inutiles {[...]? ...} en gardant uniquement le texte utile
-  description = description
+    .replace("[el4]", "air")
     .replace(/\[[^\]]*\]/g, "") // Supprime les crochets et leur contenu
-    .replace(/\{[\?~>][^}]*\}/g, (match) => {
-      // Si c'est un bloc de pluralisation, on le supprime
-      if (match.includes("?s:")) return "";
-      // Sinon on garde le contenu entre les accolades
-      return match.replace(/^\{[\?~>]/, "").replace(/\}$/, "");
-    });
+    .replace("{?s:}", "")
+    .replace("{?s:}}", "")
+    .replace("{?", "")
+    .replace("Maîtrise :", "");
+
+  //     // Si c'est un bloc de pluralisation, on le supprime
+  //     if (match.includes("?s:")) return "";
+  //     // Sinon on garde le contenu entre les accolades
+  //     return match.replace(/^\{[\?~>]/, "").replace(/\}$/, "");
+  //   });
 
   return description;
 };
