@@ -66,8 +66,7 @@ const removeAccents = (str: string) => {
 };
 
 const getItemImage = (item: any) => {
-  // Toujours récupérer le titre en français
-  const itemTitleFr = item.title["fr"];
+  const itemTitleFr = item?.title?.fr;
 
   if (!itemTitleFr) {
     console.warn("⚠️ Aucun titre en français pour cet item :", item);
@@ -134,12 +133,6 @@ const getItemStatistics = (actionId: number, params: number[]) => {
     .replace("{?s:}}", "")
     .replace("{?", "")
     .replace("Maîtrise :", "");
-
-  //     // Si c'est un bloc de pluralisation, on le supprime
-  //     if (match.includes("?s:")) return "";
-  //     // Sinon on garde le contenu entre les accolades
-  //     return match.replace(/^\{[\?~>]/, "").replace(/\}$/, "");
-  //   });
 
   return description;
 };

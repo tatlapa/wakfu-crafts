@@ -96,12 +96,11 @@ const filteredItems = computed(() => {
   let items = itemsStore.items;
   // Filtre par recherche
   if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase();
-    items = items.filter((item) =>
-      item.title[itemsStore.userLang as keyof typeof item.title]
-        .toLowerCase()
-        .includes(query)
-    );
+    items = items.filter((item) => {
+      const title = item?.title?.[itemsStore.userLang] ?? item?.title?.fr ?? ""; // fallback vide si rien
+
+      return title.toLowerCase().includes(searchQuery.value.toLowerCase());
+    });
   }
 
   // Filtre par rareté

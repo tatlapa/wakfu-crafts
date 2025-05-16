@@ -18,7 +18,7 @@ const props = defineProps({
 });
 
 const itemTitle = computed(
-  () => props.item.title[props.userLang] ?? "Nom de l'objet non disponible"
+  () => props.item?.title?.[props.userLang] || "Nom de l'objet non disponible"
 );
 </script>
 
@@ -27,7 +27,8 @@ const itemTitle = computed(
     <HoverCardTrigger as-child>
       <Card class="p-4 border rounded hover:shadow-md transition-shadow">
         <CardHeader>
-          <img
+          <NuxtImg
+            preload
             v-if="getItemImage(item)"
             :src="getItemImage(item)"
             alt="Item Image"

@@ -2,7 +2,7 @@ export default defineEventHandler(async (event) => {
   const { path } = event.context.params!;
 
   try {
-    // 1. Récupère la version actuelle via config.json
+    // 1. Récupère la version actuelle via tsconfig.json
     const config = await $fetch<{ version: string }>(
       "https://wakfu.cdn.ankama.com/gamedata/config.json"
     );
