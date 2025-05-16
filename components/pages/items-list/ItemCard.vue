@@ -27,8 +27,7 @@ const itemTitle = computed(
     <HoverCardTrigger as-child>
       <Card class="p-4 border rounded hover:shadow-md transition-shadow">
         <CardHeader>
-          <NuxtImg
-            preload
+          <img
             v-if="getItemImage(item)"
             :src="getItemImage(item)"
             alt="Item Image"
