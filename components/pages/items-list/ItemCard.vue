@@ -8,6 +8,7 @@ import {
 
 const props = defineProps({
   item: Object,
+  itemLink: String,
   getItemImage: Function,
   getItemTypeTitle: Function,
   getItemStatistics: Function,
@@ -27,13 +28,21 @@ const itemTitle = computed(
     <HoverCardTrigger as-child>
       <Card class="p-4 border rounded hover:shadow-md transition-shadow">
         <CardHeader>
-          <img
-            v-if="getItemImage(item)"
-            :src="getItemImage(item)"
-            alt="Item Image"
-            referrerpolicy="no-referrer"
-            class="w-12 h-12 rounded"
-          />
+          <div class="flex justify-between items-center">
+            <img
+              :src="getItemImage(item)"
+              alt="Item Image"
+              referrerpolicy="no-referrer"
+              class="w-12 h-12 rounded"
+            />
+            <a :href="itemLink" target="_blank" rel="noopener noreferrer">
+              <img
+                src="@/assets/icons/encyclopedia.webp"
+                alt="Encyclopedia Icon"
+                class="w-12 h-12 cursor-pointer hover:scale-125 hover:bg-black/20 p-1 rounded-full transition-all duration-300"
+              />
+            </a>
+          </div>
           <CardTitle class="flex gap-2 items-center">
             <img
               :src="

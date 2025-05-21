@@ -97,7 +97,10 @@ const filteredItems = computed(() => {
   // Filtre par recherche
   if (searchQuery.value) {
     items = items.filter((item) => {
-      const title = item?.title?.[itemsStore.userLang] ?? item?.title?.fr ?? ""; // fallback vide si rien
+      const title =
+        item?.title?.[itemsStore.userLang as keyof typeof item.title] ??
+        item?.title?.fr ??
+        ""; // fallback vide si rien
 
       return title.toLowerCase().includes(searchQuery.value.toLowerCase());
     });
@@ -142,11 +145,22 @@ const filteredItems = computed(() => {
 const allItemTypes = computed(() => {
   const combinedItems = [...itemsStore.itemTypes, ...itemsStore.equipmentTypes];
 
-  // Utiliser un Map pour conserver uniquement le dernier élément avec chaque ID
-  const uniqueItemsMap = new Map();
+  // 1. Récupérer tous les itemTypeId utilisés par les items
+  const usedTypeIds = new Set(
+    itemsStore.items.map(
+      (item) => item.definition.item.baseParameters.itemTypeId
+    )
+  );
 
-  combinedItems.forEach((item) => {
-    if (item.title && item.title.fr) {
+  // 2. Ne garder que les types d'objets utilisés
+  const filtered = combinedItems.filter((item) =>
+    usedTypeIds.has(item.definition.id)
+  );
+
+  // 3. Supprimer les doublons par titre français
+  const uniqueItemsMap = new Map();
+  filtered.forEach((item) => {
+    if (item.title?.fr) {
       uniqueItemsMap.set(
         item.title.fr.replace(/\{\[~1\]\?s:\}|\{\[~1\]\?x:\}/g, ""),
         item
@@ -154,7 +168,6 @@ const allItemTypes = computed(() => {
     }
   });
 
-  // Convertir le Map en tableau
   return Array.from(uniqueItemsMap.values());
 });
 

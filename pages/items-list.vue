@@ -10,7 +10,6 @@ import iconEpic from "~/assets/icons/rarity/epic.png";
 import iconMemory from "~/assets/icons/rarity/memory.png";
 import iconRelic from "~/assets/icons/rarity/relic.png";
 import CardContent from "~/components/ui/card/CardContent.vue";
-import { ColorScheme } from "#components";
 
 definePageMeta({
   layout: "aside",
@@ -93,6 +92,39 @@ const getItemImage = (item: any) => {
     );
     if (imageObj) {
       return imageObj.Image; // Retourne la première image trouvée
+    }
+  }
+  return null;
+};
+
+const getItemLink = (item: any) => {
+  const itemTitleFr = item?.title?.fr;
+
+  if (!itemTitleFr) {
+    console.warn("⚠️ Aucun titre en français pour cet item :", item);
+    return null;
+  }
+
+  // Supprimer les accents et mettre en minuscule pour la comparaison
+  const normalizedTitle = removeAccents(itemTitleFr);
+
+  // Liste des tableaux à vérifier
+  const dataSources = [
+    itemsStore.armures,
+    itemsStore.armes,
+    itemsStore.accessoires,
+    itemsStore.consommables,
+    itemsStore.ressources,
+    itemsStore.familiers,
+  ];
+
+  // Cherche le lien dans les 4 tableaux en comparant sans accents
+  for (const dataSource of dataSources) {
+    const linkObj = dataSource.find(
+      (data) => removeAccents(data.Nom) === normalizedTitle
+    );
+    if (linkObj) {
+      return linkObj.Lien; // Retourne la première image trouvée
     }
   }
   return null;
@@ -224,6 +256,7 @@ const copyItemTitle = (title: string, id: number) => {
         v-for="item in paginatedItems"
         :key="item.definition.item.id"
         :item="item"
+        :itemLink="getItemLink(item)"
         :getItemImage="getItemImage"
         :getItemTypeTitle="getItemTypeTitle"
         :getItemStatistics="getItemStatistics"
