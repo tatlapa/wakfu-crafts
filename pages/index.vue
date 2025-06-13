@@ -189,8 +189,8 @@ const allItemTypes = computed(() => {
 });
 
 const paginatedItems = computed(() => {
-  if (!$filteredItems.value) return [];
-
+  // Ensure $filteredItems is an array before using .slice
+  const items = Array.isArray($filteredItems.value) ? $filteredItems.value : [];
   const start = (currentPage.value - 1) * itemsPerPage;
   const end = start + itemsPerPage;
 
@@ -213,20 +213,19 @@ const copyItemTitle = (title: string, id: number) => {
 </script>
 
 <template>
-  <div class="w-2/3">
-    <!-- Statistiques des résultats -->
-    <div class="mb-4 text-sm text-muted-foreground">
-      {{ $filteredItems.length }} items trouvés
-      <span v-if="selectedItemTypes.length > 0">
-        ({{ selectedItemTypes.length }} types sélectionnés)
-      </span>
-    </div>
 
+
+  <div class="w-2/3">
+          <!-- Statistiques des résultats -->
+          <div class="mb-4 text-sm text-muted-foreground">
+      {{ $filteredItems.length }} items trouvés
+    </div>
     <!-- Liste des objets -->
     <h1 class="text-3xl font-bold mb-4">Liste des objets</h1>
+
     <div
       v-if="itemsStore.loading"
-      class="grid grid-cols-1 gap-4 mt-4 md:grid-cols-2 lg:grid-cols-3"
+      class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
     >
       <!-- Items Skeleton -->
       <Card v-for="n in 20" :key="n" class="flex items-center gap-4">
@@ -250,7 +249,7 @@ const copyItemTitle = (title: string, id: number) => {
     <!-- Liste d'items -->
     <div
       v-else
-      class="grid grid-cols-1 gap-4 my-4 md:grid-cols-2 lg:grid-cols-3"
+      class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
     >
       <ItemCard
         v-for="item in paginatedItems"
