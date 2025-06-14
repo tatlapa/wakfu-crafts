@@ -279,27 +279,6 @@ useNuxtApp().provide("filteredItems", filteredItems);
           </label>
         </div>
       </CardContent>
-
-      <!-- Liste des métiers -->
-      <CardHeader class="p-4">Métiers</CardHeader>
-      <CardContent class="grid grid-cols-2 gap-4 mb-4">
-        <div
-          v-for="job in itemsStore.jobs"
-          :key="job.definition.id"
-          class="flex gap-2 items-center"
-        >
-          <Checkbox />
-          <label class="cursor-pointer">{{
-            job.title?.[
-              itemsStore.userLang as keyof typeof job.title as
-                | "en"
-                | "es"
-                | "fr"
-                | "pt"
-            ] ?? "Nom du métier non disponible"
-          }}</label>
-        </div>
-      </CardContent>
     </Card>
   </aside>
 </template>
