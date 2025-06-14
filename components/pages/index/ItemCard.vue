@@ -71,12 +71,7 @@ const itemTitle = computed(
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <span
-                    v-if="copiedItemId === item.definition.item.id"
-                    class="text-xs text-green-500"
-                    >Copié !</span
-                  >
-                  <span v-else class="text-xs">Copier</span>
+                  <span class="text-xs">{{ $t("common.itemsCard.copy") }}</span>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

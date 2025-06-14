@@ -9,24 +9,26 @@
       "level": "Level",
       "itemTypes": "Item Types",
       "rarities": {
-    "common": "Common",
-    "rare": "Rare",
-    "mythic": "Mythic",
-    "legendary": "Legendary",
-    "relic": "Relic",
-    "memory": "Memory",
-    "epic": "Epic"
-  }
+        "common": "Common",
+        "rare": "Rare",
+        "mythic": "Mythic",
+        "legendary": "Legendary",
+        "relic": "Relic",
+        "memory": "Memory",
+        "epic": "Epic"
+      }
     },
     "items": {
       "found": "items found",
       "none": "No items found",
       "list": "Items List"
+    },
+    "itemsCard": {
+      "copy": "Copy"
     }
   },
   "footer": {
-  "discord": "Join our Discord",
-  "copyright": "All rights reserved"
+    "discord": "Join our Discord",
+    "copyright": "All rights reserved"
+  }
 }
-
-} 

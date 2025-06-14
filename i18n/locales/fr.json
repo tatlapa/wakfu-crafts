@@ -22,6 +22,9 @@
       "found": "items trouvés",
       "none": "Aucun item trouvé",
       "list": "Liste des objets"
+    },
+    "itemsCard": {
+      "copy": "Copier"
     }
   },
   "footer": {

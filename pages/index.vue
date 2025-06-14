@@ -24,9 +24,12 @@ const itemsPerPage = 12;
 const { $filteredItems } = useNuxtApp();
 
 // Réinitialiser la page courante lorsque les filtres changent
-watch(() => ($filteredItems as ComputedRef<Item[]>).value, () => {
-  currentPage.value = 1;
-});
+watch(
+  () => ($filteredItems as ComputedRef<Item[]>).value,
+  () => {
+    currentPage.value = 1;
+  }
+);
 
 const rarityArray = [
   {
@@ -196,7 +199,6 @@ const allItemTypes = computed(() => {
 
 const paginatedItems = computed(() => {
   // Ensure $filteredItems is an array before using .slice
-  const items = Array.isArray($filteredItems.value) ? $filteredItems.value : [];
   const start = (currentPage.value - 1) * itemsPerPage;
   const end = start + itemsPerPage;
 
@@ -220,12 +222,12 @@ const copyItemTitle = (title: string, id: number) => {
 
 <template>
   <div class="w-2/3">
-          <!-- Statistiques des résultats -->
-          <div class="mb-4 text-sm text-muted-foreground">
-      {{ $filteredItems.length }} {{ $t('common.items.found') }}
+    <!-- Statistiques des résultats -->
+    <div class="mb-4 text-sm text-muted-foreground">
+      {{ $filteredItems.length }} {{ $t("common.items.found") }}
     </div>
     <!-- Liste des objets -->
-    <h1 class="text-3xl font-bold mb-4">{{ $t('common.items.list') }}</h1>
+    <h1 class="text-3xl font-bold mb-4">{{ $t("common.items.list") }}</h1>
 
     <div
       v-if="itemsStore.loading"
@@ -246,15 +248,12 @@ const copyItemTitle = (title: string, id: number) => {
     <!-- Liste vide -->
     <div v-else-if="!$filteredItems.length">
       <div class="col-span-full text-center py-8">
-        <div class="text-muted-foreground">{{ $t('common.items.none') }}</div>
+        <div class="text-muted-foreground">{{ $t("common.items.none") }}</div>
       </div>
     </div>
 
     <!-- Liste d'items -->
-    <div
-      v-else
-      class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
-    >
+    <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
       <ItemCard
         v-for="item in paginatedItems"
         :key="item.definition.item.id"

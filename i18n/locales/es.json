@@ -9,25 +9,26 @@
       "level": "Nivel",
       "itemTypes": "Tipos de objetos",
       "rarities": {
-  "common": "Común",
-  "rare": "Raro",
-  "mythic": "Mítico",
-  "legendary": "Legendario",
-  "relic": "Reliquia",
-  "memory": "Memoria",
-  "epic": "Épico"
-}
+        "common": "Común",
+        "rare": "Raro",
+        "mythic": "Mítico",
+        "legendary": "Legendario",
+        "relic": "Reliquia",
+        "memory": "Memoria",
+        "epic": "Épico"
+      }
     },
     "items": {
       "found": "objetos encontrados",
       "none": "No se encontraron objetos",
       "list": "Lista de objetos"
+    },
+    "itemsCard": {
+      "copy": "Copiar"
     }
-
   },
   "footer": {
-  "discord": "Únete a nuestro Discord",
-  "copyright": "Todos los derechos reservados"
+    "discord": "Únete a nuestro Discord",
+    "copyright": "Todos los derechos reservados"
+  }
 }
-
-} 
