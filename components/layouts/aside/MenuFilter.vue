@@ -11,7 +11,9 @@ import iconMemory from "~/assets/icons/rarity/memory.png";
 import iconRelic from "~/assets/icons/rarity/relic.png";
 import CardContent from "~/components/ui/card/CardContent.vue";
 import { useItemsStore } from "~/stores/items";
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const itemsStore = useItemsStore();
 const searchQuery = ref(""); // Gère la recherche
 const selectedRarities = ref<number[]>([]); // Pour stocker les raretés sélectionnées
@@ -43,15 +45,16 @@ const isItemDroppable = (item: any) => {
   return droppableItemsSet.value.has(item.definition.item.id);
 };
 
-const rarityArray = [
-  { label: "Commun", icon: iconCommon, rarity: 1 },
-  { label: "Rare", icon: iconRare, rarity: 2 },
-  { label: "Mythique", icon: iconMythical, rarity: 3 },
-  { label: "Légendaire", icon: iconLegendary, rarity: 4 },
-  { label: "Relique", icon: iconRelic, rarity: 5 },
-  { label: "Souvenir", icon: iconMemory, rarity: 6 },
-  { label: "Épique", icon: iconEpic, rarity: 7 },
-];
+const rarityArray = computed(() => [
+  { label: t('common.filter.rarities.common'), icon: iconCommon, rarity: 1 },
+  { label: t('common.filter.rarities.rare'), icon: iconRare, rarity: 2 },
+  { label: t('common.filter.rarities.mythic'), icon: iconMythical, rarity: 3 },
+  { label: t('common.filter.rarities.legendary'), icon: iconLegendary, rarity: 4 },
+  { label: t('common.filter.rarities.relic'), icon: iconRelic, rarity: 5 },
+  { label: t('common.filter.rarities.memory'), icon: iconMemory, rarity: 6 },
+  { label: t('common.filter.rarities.epic'), icon: iconEpic, rarity: 7 },
+]);
+
 
 const extractIdFromUrl = (url: string): number | null => {
   if (!url) return null; // Vérifier que l'URL existe
@@ -176,12 +179,13 @@ useNuxtApp().provide("filteredItems", filteredItems);
 </script>
 
 <template>
-  <aside class="w-1/3">
-    <Card class="bg-muted-foreground/[0.03]">
-      <CardHeader class="p-4">Filtrer la liste</CardHeader>
+  <aside class="w-1/3 mt-[87px]">
+    <Card class="bg-muted-foreground/[0.03] px-4">
+      <CardHeader class="my-4">
+        <CardTitle>{{ $t('common.filter.title') }}</CardTitle></CardHeader>
 
       <!-- Barre de recherche -->
-      <CardContent class="p-4 space-y-3">
+      <CardContent class="my-4 space-y-3">
         <div class="relative w-full">
           <Search
             class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground"
@@ -189,7 +193,7 @@ useNuxtApp().provide("filteredItems", filteredItems);
           <input
             v-model="searchQuery"
             class="w-full pl-10 p-2 border rounded-lg"
-            placeholder="Rechercher un item..."
+            :placeholder="$t('common.filter.search')"
           />
         </div>
       </CardContent>
@@ -202,13 +206,13 @@ useNuxtApp().provide("filteredItems", filteredItems);
           class="w-5 h-5"
         />
         <label for="hideDroppable" class="text-sm cursor-pointer">
-          Cacher les objets droppables
+          {{ $t('common.filter.hideDroppable') }}
         </label>
       </CardContent>
 
       <!-- Filtre par rareté avec Toggle -->
-      <CardHeader class="p-4">Rareté</CardHeader>
-      <CardContent class="flex p-4 gap-2">
+      <CardHeader class="my-4"><CardTitle>{{ $t('common.filter.rarity') }}</CardTitle></CardHeader>
+      <CardContent class="flex gap-2">
         <TooltipProvider>
           <Tooltip v-for="rarity in rarityArray" :key="rarity.rarity">
             <TooltipTrigger as-child>
@@ -241,20 +245,23 @@ useNuxtApp().provide("filteredItems", filteredItems);
         </TooltipProvider>
       </CardContent>
 
-      <CardContent class="mt-3">
-        <div class="mb-2">Niveau {{ levelRange[0] }} - {{ levelRange[1] }}</div>
-        <Slider
+      <CardHeader class="flex-row iems-center my-4 gap-4">
+        <CardTitle>
+          {{ $t('common.filter.level') }}
+        </CardTitle> 
+          <p class="text-lg font-bold">( {{ levelRange[0] }} - {{ levelRange[1] }} )  </p>
+      </CardHeader>
+      <Slider
           v-model="levelRange"
           :min="0"
           :max="245"
           :step="1"
           :range="true"
         />
-      </CardContent>
 
       <!-- Liste des types d'objets avec filtrage actif -->
-      <CardHeader class="p-4">Types d'objets</CardHeader>
-      <CardContent class="grid grid-cols-2 gap-4 mb-6">
+      <CardHeader class="my-4"><CardTitle>{{ $t('common.filter.itemTypes') }}</CardTitle></CardHeader>
+      <CardContent class="grid grid-cols-2 gap-4 my-2">
         <div
           v-for="itemType in allItemTypes"
           :key="itemType.definition.id"

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useItemsStore } from "~/stores/items";
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
+import type { ComputedRef } from "vue";
+import type { Item } from "~/types/itemTypes";
 import ItemCard from "@/components/pages/index/ItemCard.vue";
 import iconCommon from "~/assets/icons/rarity/common.png";
 import iconRare from "~/assets/icons/rarity/rare.png";
@@ -19,8 +21,12 @@ definePageMeta({
 const itemsStore = useItemsStore();
 const currentPage = ref(1);
 const itemsPerPage = 12;
-const selectedItemTypes = ref<number[]>([]); // Pour stocker les types d'items sélectionnés
 const { $filteredItems } = useNuxtApp();
+
+// Réinitialiser la page courante lorsque les filtres changent
+watch(() => ($filteredItems as ComputedRef<Item[]>).value, () => {
+  currentPage.value = 1;
+});
 
 const rarityArray = [
   {
@@ -213,15 +219,13 @@ const copyItemTitle = (title: string, id: number) => {
 </script>
 
 <template>
-
-
   <div class="w-2/3">
           <!-- Statistiques des résultats -->
           <div class="mb-4 text-sm text-muted-foreground">
-      {{ $filteredItems.length }} items trouvés
+      {{ $filteredItems.length }} {{ $t('common.items.found') }}
     </div>
     <!-- Liste des objets -->
-    <h1 class="text-3xl font-bold mb-4">Liste des objets</h1>
+    <h1 class="text-3xl font-bold mb-4">{{ $t('common.items.list') }}</h1>
 
     <div
       v-if="itemsStore.loading"
@@ -230,7 +234,7 @@ const copyItemTitle = (title: string, id: number) => {
       <!-- Items Skeleton -->
       <Card v-for="n in 20" :key="n" class="flex items-center gap-4">
         <CardContent>
-          <Skeleton class="h-12 w-12 rounded" />
+          <Skeleton class="h-12 w-12 rounded my-3" />
           <div class="space-y-2">
             <Skeleton class="h-4 w-[250px]" />
             <Skeleton class="h-4 w-[200px]" />
@@ -242,7 +246,7 @@ const copyItemTitle = (title: string, id: number) => {
     <!-- Liste vide -->
     <div v-else-if="!$filteredItems.length">
       <div class="col-span-full text-center py-8">
-        <div class="text-muted-foreground">Aucun item trouvé</div>
+        <div class="text-muted-foreground">{{ $t('common.items.none') }}</div>
       </div>
     </div>
 

@@ -12,12 +12,12 @@
         target="_blank"
         rel="noopener noreferrer"
       >
-        <span>Rejoignez notre Discord</span>
+        <span>{{$t ('footer.discord')}}</span>
       </a>
 
       <!-- Copyright -->
       <div class="text-center text-sm text-muted-foreground">
-        <div class="mb-2">© 2025 Tatlapa - Tout droits réservés</div>
+        <div class="mb-2">© 2025 Tatlapa - {{$t ('footer.copyright')}}</div>
         <div class="text-xs">
           Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quisquam,
           ea, ipsa assumenda laboriosam corrupti commodi iure aperiam dicta

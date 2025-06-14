@@ -1,32 +1,38 @@
 <script setup lang="ts">
 import { useItemsStore } from "~/stores/items";
+import 'flag-icons/css/flag-icons.min.css';
+import { useI18n } from 'vue-i18n';
 
 const itemsStore = useItemsStore();
+const { locales, setLocale } = useI18n();
 
 onMounted(() => {
   itemsStore.getUserLang();
 });
 
-const setLanguage = (lang: string) => {
-  itemsStore.userLang = lang;
-  localStorage.setItem("lang", lang);
+const switchLanguage = (lang: string) => {
+  if (lang === 'fr' || lang === 'en' || lang === 'es' || lang === 'pt') {
+    setLocale(lang);
+    itemsStore.userLang = lang;
+    localStorage.setItem("lang", lang);
+  }
 };
 </script>
 
 <template>
   <div class="flex justify-between w-full items-center px-8 py-3 bg-black text-black">
-    <h1 class="text-white">Wakfu Crafter</h1>
+    <h1 class="text-white">{{ $t('common.title') }}</h1>
     <div class="w-32">
-      <Select v-model="itemsStore.userLang" @update:modelValue="setLanguage">
+      <Select v-model="itemsStore.userLang" @update:modelValue="switchLanguage">
         <SelectTrigger>
-          <SelectValue placeholder="Choisir une langue" />
+          <SelectValue/>
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            <SelectItem value="fr">🇫🇷 Français</SelectItem>
-            <SelectItem value="en">🇬🇧 English</SelectItem>
-            <SelectItem value="es">🇪🇸 Español</SelectItem>
-            <SelectItem value="pt">🇵🇹 Português</SelectItem>
+            <SelectItem v-for="locale in locales" :key="locale.code" :value="locale.code">
+              <span :class="['fi', `fi-${locale.code === 'en' ? 'gb' : locale.code}`, 'mr-2']"></span>
+              {{ locale.name }}
+            </SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>

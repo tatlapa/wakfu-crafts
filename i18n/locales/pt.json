@@ -1,0 +1,33 @@
+{
+  "common": {
+    "title": "Wakfu Crafter",
+    "filter": {
+      "title": "Filtrar lista",
+      "search": "Pesquisar um item...",
+      "hideDroppable": "Ocultar itens obtidos",
+      "rarity": "Raridade",
+      "level": "Nível",
+      "itemTypes": "Tipos de itens",
+      "rarities": {
+    "common": "Comum",
+    "rare": "Raro",
+    "mythic": "Mítico",
+    "legendary": "Lendário",
+    "relic": "Relíquia",
+    "memory": "Memória",
+    "epic": "Épico"
+  }
+    },
+    "items": {
+      "found": "itens encontrados",
+      "none": "Nenhum item encontrado",
+      "list": "Lista de itens"
+    }
+
+  },
+  "footer": {
+  "discord": "Junte-se ao nosso Discord",
+  "copyright": "Todos os direitos reservados"
+}
+
+} 
