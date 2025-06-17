@@ -8,6 +8,7 @@
       "rarity": "Rarity",
       "level": "Level",
       "itemTypes": "Item Types",
+      "itemType": "Type",
       "rarities": {
         "common": "Common",
         "rare": "Rare",

@@ -17,6 +17,9 @@ const props = defineProps({
   copyItemTitle: Function,
   copiedItemId: Number | null,
 });
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const itemTitle = computed(
   () => props.item?.title?.[props.userLang] || "Nom de l'objet non disponible"
@@ -39,7 +42,7 @@ const itemTitle = computed(
               <img
                 src="@/assets/icons/encyclopedia.webp"
                 alt="Encyclopedia Icon"
-                class="w-12 h-12 cursor-pointer hover:scale-125 hover:bg-black/20 p-1 rounded-full transition-all duration-300"
+                class="w-12 cursor-pointer hover:scale-125 hover:bg-black/20 p-1 rounded-full transition-all duration-300"
               />
             </a>
           </div>
@@ -79,7 +82,7 @@ const itemTitle = computed(
         </CardHeader>
 
         <CardContent>
-          Type :
+          {{ t('common.filter.itemType') }} :
           {{
             getItemTypeTitle(
               item.definition.item.baseParameters.itemTypeId
@@ -87,7 +90,7 @@ const itemTitle = computed(
           }}
         </CardContent>
 
-        <CardContent> Niveau {{ item.definition.item.level }} </CardContent>
+        <CardContent> {{ t('common.filter.level') }} {{ item.definition.item.level }} </CardContent>
         <CardContent> ID {{ item.definition.item.id }} </CardContent>
       </Card>
     </HoverCardTrigger>

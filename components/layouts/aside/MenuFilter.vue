@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { Search } from "lucide-vue-next";
+import { Search, CircleX  } from "lucide-vue-next";
 import { Toggle } from "@/components/ui/toggle"; // Import du Toggle de shadcn-vue
 import iconCommon from "~/assets/icons/rarity/common.png";
 import iconRare from "~/assets/icons/rarity/rare.png";
@@ -195,6 +195,14 @@ useNuxtApp().provide("filteredItems", filteredItems);
             class="w-full pl-10 p-2 border rounded-lg"
             :placeholder="$t('common.filter.search')"
           />
+          <CircleX
+  class="absolute right-3 top-1/2 -translate-y-1/2
+         text-muted-foreground hover:text-foreground
+         hover:bg-foreground/10 hover:scale-110 active:scale-95
+         transition-all duration-150 ease-in-out
+         rounded-full p-1 cursor-pointer" @click="searchQuery = ''"
+/>
+
         </div>
       </CardContent>
 

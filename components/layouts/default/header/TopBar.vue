@@ -20,8 +20,8 @@ const switchLanguage = (lang: string) => {
 </script>
 
 <template>
-  <div class="flex justify-between w-full items-center px-8 py-3 bg-black text-black">
-    <h1 class="text-white">{{ $t('common.title') }}</h1>
+  <header class="flex justify-between w-full items-center px-8 py-3 bg-gradient-to-r from-gray-900 to-black shadow-md">
+    <h1 class="text-white text-2xl">{{ $t('common.title') }}</h1>
     <div class="w-32">
       <Select v-model="itemsStore.userLang" @update:modelValue="switchLanguage">
         <SelectTrigger>
@@ -37,5 +37,5 @@ const switchLanguage = (lang: string) => {
         </SelectContent>
       </Select>
     </div>
-  </div>
+  </header>
 </template>

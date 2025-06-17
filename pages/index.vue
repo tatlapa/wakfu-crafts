@@ -17,11 +17,10 @@ definePageMeta({
   layout: "aside",
 });
 
-// const props = defineProps<{ searchQuery: string }>(); // Récupération du searchQuery
 const itemsStore = useItemsStore();
 const currentPage = ref(1);
 const itemsPerPage = 12;
-const { $filteredItems } = useNuxtApp();
+const $filteredItems = useNuxtApp().$filteredItems as ComputedRef<Item[]>;
 
 // Réinitialiser la page courante lorsque les filtres changent
 watch(
