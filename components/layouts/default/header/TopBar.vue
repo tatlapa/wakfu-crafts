@@ -25,7 +25,7 @@ const switchLanguage = (lang: string) => {
     <div class="w-32">
       <Select v-model="itemsStore.userLang" @update:modelValue="switchLanguage">
         <SelectTrigger>
-          <SelectValue/>
+          <SelectValue :placeholder="locales.find(l => l.code === itemsStore.userLang)?.name" />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
