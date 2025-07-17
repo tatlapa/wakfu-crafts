@@ -22,12 +22,34 @@ const hideDroppable = ref(false);
 const droppableItemsSet = ref<Set<number>>(new Set());
 const selectedItemTypes = ref<number[]>([]); // Pour stocker les types d'items sélectionnés
 
+// Emettre les événements de filtrage
+const emit = defineEmits<{
+  'filters-changed': [filters: {
+    searchQuery: string;
+    selectedRarities: number[];
+    levelRange: [number, number];
+    hideDroppable: boolean;
+    selectedItemTypes: number[];
+  }];
+}>();
+
+const emitFilters = () => {
+  emit('filters-changed', {
+    searchQuery: searchQuery.value,
+    selectedRarities: selectedRarities.value,
+    levelRange: levelRange.value,
+    hideDroppable: hideDroppable.value,
+    selectedItemTypes: selectedItemTypes.value,
+  });
+};
+
 const toggleRarity = (rarity: number) => {
   if (selectedRarities.value.includes(rarity)) {
     selectedRarities.value = selectedRarities.value.filter((r) => r !== rarity);
   } else {
     selectedRarities.value.push(rarity);
   }
+  emitFilters();
 };
 
 // Fonction pour basculer la sélection d'un type d'item
@@ -39,6 +61,7 @@ const toggleItemType = (typeId: number) => {
   } else {
     selectedItemTypes.value.push(typeId);
   }
+  emitFilters();
 };
 
 const isItemDroppable = (item: any) => {
@@ -54,7 +77,6 @@ const rarityArray = computed(() => [
   { label: t('common.filter.rarities.memory'), icon: iconMemory, rarity: 6 },
   { label: t('common.filter.rarities.epic'), icon: iconEpic, rarity: 7 },
 ]);
-
 
 const extractIdFromUrl = (url: string): number | null => {
   if (!url) return null; // Vérifier que l'URL existe
@@ -95,55 +117,12 @@ onMounted(async () => {
   droppableItemsSet.value = droppableIds;
 });
 
-const filteredItems = computed(() => {
-  let items = itemsStore.items;
-  // Filtre par recherche
-  if (searchQuery.value) {
-    items = items.filter((item) => {
-      const title =
-        item?.title?.[itemsStore.userLang as keyof typeof item.title] ??
-        item?.title?.fr ??
-        ""; // fallback vide si rien
-
-      return title.toLowerCase().includes(searchQuery.value.toLowerCase());
-    });
-  }
-
-  // Filtre par rareté
-  if (selectedRarities.value.length > 0) {
-    items = items.filter((item) =>
-      selectedRarities.value.includes(
-        item.definition.item.baseParameters.rarity
-      )
-    );
-  }
-
-  // Filtre par type d'item
-  if (selectedItemTypes.value.length > 0) {
-    items = items.filter((item) =>
-      selectedItemTypes.value.includes(
-        item.definition.item.baseParameters.itemTypeId
-      )
-    );
-  }
-
-  // Filtre pour cacher les objets droppables (si activé)
-  if (hideDroppable.value) {
-    items = items.filter((item) => !isItemDroppable(item));
-  }
-
-  // Filtre par plage de niveaux
-  items = items.filter(
-    (item) =>
-      item.definition.item.level >= levelRange.value[0] &&
-      item.definition.item.level <= levelRange.value[1]
-  );
-
-  // Tri par niveau décroissant
-  items.sort((a, b) => b.definition.item.level - a.definition.item.level);
-
-  return items;
-});
+// Watchers pour émettre les changements
+watch(searchQuery, emitFilters);
+watch(selectedRarities, emitFilters);
+watch(levelRange, emitFilters);
+watch(hideDroppable, emitFilters);
+watch(selectedItemTypes, emitFilters);
 
 const allItemTypes = computed(() => {
   const combinedItems = [...itemsStore.itemTypes, ...itemsStore.equipmentTypes];
@@ -174,12 +153,10 @@ const allItemTypes = computed(() => {
   return Array.from(uniqueItemsMap.values());
 });
 
-// Exposer `filteredItems` globalement pour qu'il soit accessible dans la page
-useNuxtApp().provide("filteredItems", filteredItems);
+// Le composant MenuFilter gère ses propres filtres localement
 </script>
 
 <template>
-  <aside class="w-1/3 mt-[87px]">
     <Card class="bg-muted-foreground/[0.03] px-4">
       <CardHeader class="my-4">
         <CardTitle>{{ $t('common.filter.title') }}</CardTitle></CardHeader>
@@ -295,5 +272,4 @@ useNuxtApp().provide("filteredItems", filteredItems);
         </div>
       </CardContent>
     </Card>
-  </aside>
 </template>
